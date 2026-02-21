@@ -97,16 +97,23 @@ Area0 の3台は Router Priority がデフォルト（1）のため、**Router I
 
 ## 起動・停止
 
+このラボは Area0 にブロードキャストセグメントが必要なため、Linux bridge（br-area0）を使用する。
+スクリプトが bridge の作成・削除を自動で行う。sudo パスワードの入力が1回必要。
+
 ```bash
 cd ~/git/container_lab/lab02-ospf
-containerlab deploy -t topology.yml
+
+# 起動（bridge 作成 + containerlab deploy）
+./deploy.sh
 
 # 状態確認
 containerlab inspect -t topology.yml
 
-# 停止・削除
-containerlab destroy -t topology.yml
+# 停止・削除（containerlab destroy + bridge 削除）
+./destroy.sh
 ```
+
+> **Note:** WSL2 を再起動すると bridge が消えるが、`./deploy.sh` を実行すれば自動で再作成される。
 
 ---
 
