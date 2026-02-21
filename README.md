@@ -57,7 +57,7 @@ cEOS（cEOS-lab）は Arista が提供する Docker 向けの仮想 EOS。
 ### Docker に取り込む
 
 ```bash
-docker import cEOS64-lab-4.34.4M.tar.xz ceos:4.34.4M
+docker import os-images/cEOS64-lab-4.34.4M.tar.xz ceos:4.34.4M
 ```
 
 > **Note:** Windows からコピーした場合、拡張子が `.tar.tar` になることがある。
