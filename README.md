@@ -118,7 +118,25 @@ containerlab version
 
 | ラボ | 概要 |
 |------|------|
-| [lab01-basic](./lab01-basic/LAB_GUIDE.md) | ceos1 -- ceos2 の2台シンプル接続 |
+| [lab01-basic](./lab01-basic/LAB_GUIDE.md) | 動作確認用の最小構成。ceos1 -- ceos2 を接続するだけで、ルーティング設定なし |
+| [lab02-ospf](./lab02-ospf/LAB_GUIDE.md) | OSPF 基礎検証（5台）。マルチエリア構成で DR/BDR 選出・ABR 動作・Type3 LSA を確認する |
+
+### ラボの起動・停止
+
+全ラボ共通で `deploy.sh` / `destroy.sh` を使って操作する。
+
+```bash
+cd ~/git/container_lab/<ラボ名>
+
+# 起動
+./deploy.sh
+
+# 停止・削除
+./destroy.sh
+```
+
+> **Note:** ラボによっては `deploy.sh` 内で Linux bridge の作成など追加処理が行われる場合がある。
+> 各ラボの詳細は LAB_GUIDE.md を参照。
 
 ---
 
@@ -176,6 +194,21 @@ topology.yml の `startup-config` オプションでパスワード認証を有�
 | SSH で `Permission denied` | cEOS デフォルトは公開鍵認証のみ | `docker exec -it <コンテナ名> Cli` で代替 |
 | `Unable to init module loader` | WSL2 カーネルに modules.dep がない | 警告のみ・動作には影響なし |
 | `the input device is not a TTY` | `docker exec -it` を非対話シェルから実行 | `-it` を外して `docker exec <コンテナ名> /usr/bin/Cli -c "..."` |
+| startup-config を修正しても反映されない | `containerlab destroy` 後も `clab-<lab名>/` ディレクトリが残り古い設定が使われる | `destroy` 後に `rm -rf clab-<lab名>/` を実行してから再デプロイ |
+
+### cEOS の Ethernet インターフェースについて
+
+cEOS の Ethernet インターフェースはデフォルトで **L2（switchport）モード** になっている。
+L3 ルーティングで IP アドレスを設定する場合は `no switchport` を明示的に入れる必要がある。
+入れ忘れると running-config に `ip address` が入っているように見えても実際には機能しない。
+
+```
+interface Ethernet1
+   no switchport        ← L3 として使う場合は必須
+   ip address 10.0.0.1/24
+```
+
+`show ip interface Ethernet1` で `does not support IP` と表示されたら、`no switchport` 不足が原因。
 
 ---
 
