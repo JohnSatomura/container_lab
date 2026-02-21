@@ -120,15 +120,16 @@ ip route 0.0.0.0/0 172.20.20.1
 ## 起動・停止
 
 ```bash
-# 起動（topology.yml があるディレクトリで実行）
 cd ~/git/container_lab/lab01-basic
-containerlab deploy -t topology.yml
+
+# 起動
+./deploy.sh
 
 # 状態確認
 containerlab inspect -t topology.yml
 
 # 停止・削除
-containerlab destroy -t topology.yml
+./destroy.sh
 ```
 
 ---
