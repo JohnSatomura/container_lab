@@ -177,6 +177,21 @@ topology.yml の `startup-config` オプションでパスワード認証を有�
 | SSH で `Permission denied` | cEOS デフォルトは公開鍵認証のみ | `docker exec -it <コンテナ名> Cli` で代替 |
 | `Unable to init module loader` | WSL2 カーネルに modules.dep がない | 警告のみ・動作には影響なし |
 | `the input device is not a TTY` | `docker exec -it` を非対話シェルから実行 | `-it` を外して `docker exec <コンテナ名> /usr/bin/Cli -c "..."` |
+| startup-config を修正しても反映されない | `containerlab destroy` 後も `clab-<lab名>/` ディレクトリが残り古い設定が使われる | `destroy` 後に `rm -rf clab-<lab名>/` を実行してから再デプロイ |
+
+### cEOS の Ethernet インターフェースについて
+
+cEOS の Ethernet インターフェースはデフォルトで **L2（switchport）モード** になっている。
+L3 ルーティングで IP アドレスを設定する場合は `no switchport` を明示的に入れる必要がある。
+入れ忘れると running-config に `ip address` が入っているように見えても実際には機能しない。
+
+```
+interface Ethernet1
+   no switchport        ← L3 として使う場合は必須
+   ip address 10.0.0.1/24
+```
+
+`show ip interface Ethernet1` で `does not support IP` と表示されたら、`no switchport` 不足が原因。
 
 ---
 
