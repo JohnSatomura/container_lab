@@ -1,0 +1,17 @@
+# containerlab が deploy 時に自動生成するディレクトリ
+# 各ラボの設定・ログ・証明書が入るが、手動管理するものではない
+clab-*/
+
+# Arista cEOS イメージファイル
+# ライセンス上の再配布禁止 + GitHub の容量制限（100MB）を超えるため除外
+*.tar
+*.tar.xz
+*.tar.gz
+*.tar.bz2
+*.xz
+
+# Windows が WSL2 へのコピー時に付けるメタデータファイル
+*:Zone.Identifier
+
+# Claude Code の内部ファイル（セッションメモリ等）
+.claude/

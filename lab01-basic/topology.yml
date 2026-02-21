@@ -1,0 +1,13 @@
+name: lab01-basic
+
+topology:
+  nodes:
+    ceos1:
+      kind: ceos
+      image: ceos:4.34.4M
+    ceos2:
+      kind: ceos
+      image: ceos:4.34.4M
+
+  links:
+    - endpoints: ["ceos1:eth1", "ceos2:eth1"]

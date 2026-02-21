@@ -1,0 +1,185 @@
+# containerlab 検証環境 セットアップ手順
+
+## このリポジトリについて
+
+Windows + WSL2 上に containerlab を使って Arista cEOS の仮想ネットワーク検証環境を構築するための手順書。
+BGP・OSPF・EVPN/VXLAN などのプロトコル検証や、Ansible による自動化の練習を目的としている。
+
+ネットワーク機器の実機を用意しなくても、ノートPC1台でルーターを複数台起動して設定を試せる。
+
+---
+
+## 前提条件
+
+- Windows + WSL2
+- Docker インストール済み
+- arista.com アカウント（cEOS ダウンロード用）
+
+---
+
+## 1. WSL2 メモリ増量
+
+デフォルトの WSL2 はメモリが少ないため、`C:\Users\<ユーザー名>\.wslconfig` を作成して増量する。
+cEOS は 1 台あたり約 1GB のメモリを消費するため、複数台起動する場合は特に重要。
+
+```ini
+[wsl2]
+memory=12GB
+processors=12
+swap=2GB
+```
+
+設定後、PowerShell で再起動：
+
+```powershell
+wsl --shutdown
+```
+
+### 確認
+
+```bash
+free -h
+# Mem: 12GB 程度であること
+```
+
+---
+
+## 2. cEOS イメージの取得
+
+cEOS（cEOS-lab）は Arista が提供する Docker 向けの仮想 EOS。
+実機と同じ EOS ソフトウェアがコンテナとして動くため、実際のコマンド体系でそのまま練習できる。
+
+1. [arista.com](https://www.arista.com) にログイン
+2. Support → Software Downloads → cEOS-lab
+3. `cEOS64-lab-4.34.4M.tar.xz` をダウンロード（64bit・Mリリース推奨）
+4. WSL2 の作業ディレクトリに配置
+
+### Docker に取り込む
+
+```bash
+docker import cEOS64-lab-4.34.4M.tar.xz ceos:4.34.4M
+```
+
+> **Note:** Windows からコピーした場合、拡張子が `.tar.tar` になることがある。
+> `file <ファイル名>` で `XZ compressed data` と表示されれば問題なくそのまま実行できる。
+
+### 確認
+
+```bash
+docker images ceos
+# ceos:4.34.4M が表示されること
+```
+
+---
+
+## 3. containerlab のインストール
+
+containerlab はネットワーク機器のコンテナを「トポロジーファイル（YAML）」で定義して
+一括起動・停止できるツール。仮想リンクの結線や管理ネットワークの払い出しも自動でやってくれる。
+
+```bash
+sudo bash -c "$(curl -sL https://get.containerlab.dev)"
+```
+
+> **Note:** `sudo` を付けないとパスワード入力エラーになる。
+
+### 確認
+
+```bash
+containerlab version
+# version: 0.73.0 程度が表示されること
+```
+
+---
+
+## 4. sudo なし実行のためのグループ設定
+
+containerlab はデフォルトで `sudo` が必要。`clab_admins` グループに追加することで不要になる。
+毎回 sudo を入力する手間が省けるほか、Ansible などのスクリプトから呼び出すときにも都合がよい。
+
+```bash
+sudo usermod -aG clab_admins $USER
+# 設定反映のため WSL2 を再起動
+wsl --shutdown
+```
+
+### 確認
+
+```bash
+containerlab version
+# sudo なしでバージョンが表示されること
+```
+
+---
+
+## 5. ラボ一覧
+
+各ラボの構成図・設定内容・起動手順・確認コマンドは LAB_GUIDE.md を参照。
+
+| ラボ | 概要 |
+|------|------|
+| [lab01-basic](./lab01-basic/LAB_GUIDE.md) | ceos1 -- ceos2 の2台シンプル接続 |
+
+---
+
+## 6. cEOS への接続方法と sshpass について
+
+### なぜ sshpass を試みたか
+
+セットアップ中、SSH でパスワードを自動入力して非対話的に EOS コマンドを実行しようとした。
+`ssh admin@172.20.20.2 "show version"` をスクリプトから呼び出すには、
+パスワードを自動で渡す手段が必要であり、`sshpass` がその用途に使われる定番ツールである。
+
+### sshpass の危険性（本番環境では使用禁止）
+
+`sshpass` はパスワードをコマンドライン引数として渡す仕組みのため、以下のリスクがある：
+
+| リスク | 内容 |
+|--------|------|
+| プロセス一覧に露出 | `ps aux` を実行すると同一ホストの他ユーザーにパスワードが見える |
+| シェル履歴に残る | `~/.bash_history` にパスワード付きコマンドが記録される |
+| ログに残る | sudo ログや監査ログにパスワードが記録される場合がある |
+
+**本番ネットワーク機器・共有サーバーでは絶対に使ってはいけない。**
+この検証環境（ローカルの WSL2 内）に限り、利便性のために検討した経緯がある。
+
+### 結論：この環境では docker exec を使う
+
+cEOS はデフォルトで公開鍵認証のみ受け付ける設定になっており、
+パスワード認証では `Permission denied (publickey,keyboard-interactive)` となる。
+`sshpass` を使う以前に、そもそもパスワード SSH が通らないため意味がない。
+
+**この環境では `docker exec` 経由の接続を標準とする：**
+
+```bash
+# 対話モード（実機ターミナルと同じ操作感）
+docker exec -it <コンテナ名> Cli
+
+# 非対話（スクリプト・確認用）
+docker exec <コンテナ名> /usr/bin/Cli -c "show version"
+```
+
+コンテナ名は `containerlab inspect -t topology.yml` で確認できる。
+各ラボでの具体的なコンテナ名は各 LAB_GUIDE.md を参照。
+
+SSH を使いたい場合は、startup-config に公開鍵を仕込むか、
+topology.yml の `startup-config` オプションでパスワード認証を有効化する方法がある（別途検討）。
+
+---
+
+## 注意事項・ハマりポイント
+
+| 事象 | 原因 | 対処 |
+|------|------|------|
+| `containerlab: command not found` | グループ設定前に sudo なし実行した | `sudo usermod -aG clab_admins $USER` 後に WSL2 再起動 |
+| `cEOS64-lab-*.tar.tar` になる | Windows からのコピーで拡張子が二重になる | そのまま `docker import` で OK（中身は XZ 圧縮） |
+| SSH で `Permission denied` | cEOS デフォルトは公開鍵認証のみ | `docker exec -it <コンテナ名> Cli` で代替 |
+| `Unable to init module loader` | WSL2 カーネルに modules.dep がない | 警告のみ・動作には影響なし |
+| `the input device is not a TTY` | `docker exec -it` を非対話シェルから実行 | `-it` を外して `docker exec <コンテナ名> /usr/bin/Cli -c "..."` |
+
+---
+
+## 参考
+
+- [containerlab 公式ドキュメント](https://containerlab.dev)
+- [Arista cEOS-lab ドキュメント](https://containerlab.dev/manual/kinds/ceos/)
