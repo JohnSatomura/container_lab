@@ -118,7 +118,8 @@ containerlab version
 
 | ラボ | 概要 |
 |------|------|
-| [lab01-basic](./lab01-basic/LAB_GUIDE.md) | ceos1 -- ceos2 の2台シンプル接続 |
+| [lab01-basic](./lab01-basic/LAB_GUIDE.md) | 動作確認用の最小構成。ceos1 -- ceos2 を接続するだけで、ルーティング設定なし |
+| [lab02-ospf](./lab02-ospf/LAB_GUIDE.md) | OSPF 基礎検証（5台）。マルチエリア構成で DR/BDR 選出・ABR 動作・Type3 LSA を確認する |
 
 ---
 
