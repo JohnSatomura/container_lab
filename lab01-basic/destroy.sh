@@ -2,5 +2,9 @@
 set -e
 cd "$(dirname "$0")"
 
-containerlab destroy -t topology.yml
-rm -rf clab-lab01-basic/
+if [ -f topology-full.yml ]; then
+  containerlab destroy -t topology-full.yml
+else
+  containerlab destroy -t topology.yml
+fi
+rm -rf clab-lab01-basic/ topology-full.yml
