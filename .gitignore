@@ -2,6 +2,9 @@
 # 各ラボの設定・ログ・証明書が入るが、手動管理するものではない
 clab-*/
 
+# --full モード用の一時トポロジファイル（deploy.sh が生成・destroy.sh が削除）
+topology-full.yml
+
 # OS イメージファイル（os-images/ 配下に格納）
 # ライセンス上の再配布禁止 + GitHub の容量制限（100MB）を超えるため除外
 os-images/*

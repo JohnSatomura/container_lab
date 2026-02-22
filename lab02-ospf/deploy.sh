@@ -22,10 +22,8 @@ else
 fi
 
 if [ "$CONFIG_DIR" = "configs-full" ]; then
-  TMP=$(mktemp /tmp/topology-XXXXXX.yml)
-  sed "s|configs-init|configs-full|g" topology.yml > "$TMP"
-  containerlab deploy -t "$TMP"
-  rm -f "$TMP"
+  sed "s|configs-init|configs-full|g" topology.yml > topology-full.yml
+  containerlab deploy -t topology-full.yml
 else
   containerlab deploy -t topology.yml
 fi
