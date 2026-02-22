@@ -1,0 +1,22 @@
+---
+# OSPF 設定を全ノードに一括投入する playbook
+# 実行: ansible-playbook -i ../inventory.yml site.yml
+
+- name: OSPF 設定投入
+  hosts: all
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: OSPF router-id 設定
+      arista.eos.eos_config:
+        lines:
+          - "router-id {{ ospf_router_id }}"
+        parents: "router ospf {{ ospf_process_id }}"
+
+    - name: OSPF ネットワーク設定
+      arista.eos.eos_config:
+        lines:
+          - "network {{ item.prefix }} area {{ item.area }}"
+        parents: "router ospf {{ ospf_process_id }}"
+      loop: "{{ ospf_networks }}"

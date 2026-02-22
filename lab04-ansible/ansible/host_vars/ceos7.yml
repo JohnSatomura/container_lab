@@ -1,0 +1,7 @@
+# ceos7: Host1（Leaf1 配下）
+ospf_router_id: "7.7.7.7"
+ospf_networks:
+  - prefix: "7.7.7.7/32"
+    area: "0.0.0.0"
+  - prefix: "10.3.0.0/30"
+    area: "0.0.0.0"
