@@ -2,11 +2,16 @@
 
 ## 目的
 
-- **eBGP セッション確立**：異なる AS 間で BGP ピアが Established になる動作を確認する
-- **iBGP セッション確立**：同一 AS 内で BGP ピアが Established になる動作を確認する
-- **next-hop-self の効果**：ASBR が iBGP ピアに対して nexthop を自分自身に書き換える動作を確認する
-- **AS-PATH 属性**：eBGP を通過するたびに AS 番号が追加される動作を確認する
-- **エンドツーエンド到達性**：AS65001 の stub（ceos1）から AS65003 の stub（ceos5）まで ping が通ることを確認する
+3AS 構成で iBGP・eBGP を自分で設定することで、AS 間ルーティングの仕組みと BGP 特有の動作を実感する。
+DC ネットワーク・クラウド接続・ISP 環境で必須となる BGP の土台を身につけることがゴール。
+
+### このラボで学べること
+
+- **iBGP と eBGP の違い**：同一 AS 内（iBGP）と AS 間（eBGP）でセッションの扱いがどう異なるかを理解する
+- **next-hop-self の必要性**：iBGP がなぜ nexthop を書き換えないのか、それがなぜ問題になるかを実際に体験する
+- **AS-PATH 属性**：eBGP を通過するたびに AS 番号が追加されるループ防止の仕組みを理解する
+- **ASBR の役割**：AS 境界ルーターが iBGP と eBGP の橋渡しをする設計パターンを理解する
+- **ハンズオン設定スキル**：`router bgp` の基本設定（neighbor・remote-as・next-hop-self・network 広告）を自分で入力できるようにする
 
 ---
 
