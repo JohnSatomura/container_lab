@@ -59,13 +59,13 @@ lab02-ospf/
 ├── deploy.sh           # 起動スクリプト（--full オプションあり）
 ├── destroy.sh          # 停止・削除スクリプト
 ├── LAB_GUIDE.md        # このファイル
-├── configs-init/       # 練習モード用（hostname + interface IP のみ）
+├── configs-init/       # ハンズオンモード用（hostname + interface IP のみ）
 │   ├── ceos1.cfg
 │   ├── ceos2.cfg
 │   ├── ceos3.cfg
 │   ├── ceos4.cfg
 │   └── ceos5.cfg
-└── configs-full/       # 設定済みモード用（OSPF 含む完全設定）
+└── configs-full/       # フルコンフィグモード用（OSPF 含む完全設定）
     ├── ceos1.cfg       # ABR（Area0 + Area1）
     ├── ceos2.cfg       # ABR（Area0 + Area2）
     ├── ceos3.cfg       # バックボーンルーター（Area0 のみ）
@@ -111,10 +111,10 @@ Area0 の3台は Router Priority がデフォルト（1）のため、**Router I
 ```bash
 cd ~/git/container_lab/lab02-ospf
 
-# 起動（練習モード：interface IP のみ設定済み・OSPF は手動で入力）
+# 起動（ハンズオンモード：interface IP のみ設定済み・OSPF は手動で入力）
 ./deploy.sh
 
-# 起動（確認モード：OSPF 含む全設定済み）
+# 起動（フルコンフィグモード：OSPF 含む全設定済み）
 ./deploy.sh --full
 
 # 状態確認
@@ -128,7 +128,7 @@ containerlab inspect -t topology.yml
 
 ---
 
-## 練習モードの設定タスク
+## ハンズオンモードの設定タスク
 
 `./deploy.sh`（オプションなし）で起動した場合、各ノードには hostname と interface IP のみ設定されている。
 以下のタスクを自分で設定することがこのラボの目的。

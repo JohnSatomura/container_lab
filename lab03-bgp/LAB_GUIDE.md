@@ -49,13 +49,13 @@ lab03-bgp/
 ├── deploy.sh           # 起動スクリプト（--full オプションあり）
 ├── destroy.sh          # 停止・削除スクリプト
 ├── LAB_GUIDE.md        # このファイル
-├── configs-init/       # 練習モード用（hostname + interface IP のみ）
+├── configs-init/       # ハンズオンモード用（hostname + interface IP のみ）
 │   ├── ceos1.cfg
 │   ├── ceos2.cfg
 │   ├── ceos3.cfg
 │   ├── ceos4.cfg
 │   └── ceos5.cfg
-└── configs-full/       # 設定済みモード用（BGP 含む完全設定）
+└── configs-full/       # フルコンフィグモード用（BGP 含む完全設定）
     ├── ceos1.cfg       # AS65001 stub（iBGP only）
     ├── ceos2.cfg       # AS65001 ASBR（iBGP + eBGP、next-hop-self）
     ├── ceos3.cfg       # AS65002 transit（eBGP only）
@@ -104,10 +104,10 @@ AS-PATH: 65002 65003
 ```bash
 cd ~/git/container_lab/lab03-bgp
 
-# 起動（練習モード：interface IP のみ設定済み・BGP は手動で入力）
+# 起動（ハンズオンモード：interface IP のみ設定済み・BGP は手動で入力）
 ./deploy.sh
 
-# 起動（確認モード：BGP 含む全設定済み）
+# 起動（フルコンフィグモード：BGP 含む全設定済み）
 ./deploy.sh --full
 
 # 状態確認
@@ -119,7 +119,7 @@ containerlab inspect -t topology.yml
 
 ---
 
-## 練習モードの設定タスク
+## ハンズオンモードの設定タスク
 
 `./deploy.sh`（オプションなし）で起動した場合、各ノードには hostname と interface IP のみ設定されている。
 以下のタスクを自分で設定することがこのラボの目的。

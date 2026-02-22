@@ -5,9 +5,9 @@ CONFIG_DIR="configs-init"
 
 if [ "$1" = "--full" ]; then
   CONFIG_DIR="configs-full"
-  echo "[INFO] 設定済みモード（configs-full）で起動します"
+  echo "[INFO] フルコンフィグモード（configs-full）で起動します"
 else
-  echo "[INFO] 練習モード（configs-init）で起動します"
+  echo "[INFO] ハンズオンモード（configs-init）で起動します"
 fi
 
 # Linux bridge の作成（既に存在する場合はスキップ）

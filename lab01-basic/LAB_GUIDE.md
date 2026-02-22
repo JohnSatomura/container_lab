@@ -47,10 +47,10 @@ lab01-basic/
 ├── deploy.sh             # 起動スクリプト（--full オプションあり）
 ├── destroy.sh            # 停止・削除スクリプト
 ├── LAB_GUIDE.md          # このファイル（構成図・設定内容・操作手順）
-├── configs-init/         # 練習モード用（hostname のみ）
+├── configs-init/         # ハンズオンモード用（hostname のみ）
 │   ├── ceos1.cfg
 │   └── ceos2.cfg
-└── configs-full/         # 設定済みモード用（lab01 は init と同一）
+└── configs-full/         # フルコンフィグモード用（lab01 は init と同一）
     ├── ceos1.cfg
     └── ceos2.cfg
 ```
