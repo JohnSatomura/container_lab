@@ -46,10 +46,16 @@ Lo:1.1.1.1   Lo:2.2.2.2   Lo:3.3.3.3   Lo:4.4.4.4   Lo:5.5.5.5
 ```
 lab03-bgp/
 ├── topology.yml        # containerlab トポロジー定義
-├── deploy.sh           # containerlab deploy（Linux bridge 不要）
-├── destroy.sh          # containerlab destroy + clab ディレクトリ削除
+├── deploy.sh           # 起動スクリプト（--full オプションあり）
+├── destroy.sh          # 停止・削除スクリプト
 ├── LAB_GUIDE.md        # このファイル
-└── configs/            # 各ノードの startup-config
+├── configs-init/       # ハンズオンモード用（hostname + interface IP のみ）
+│   ├── ceos1.cfg
+│   ├── ceos2.cfg
+│   ├── ceos3.cfg
+│   ├── ceos4.cfg
+│   └── ceos5.cfg
+└── configs-full/       # フルコンフィグモード用（BGP 含む完全設定）
     ├── ceos1.cfg       # AS65001 stub（iBGP only）
     ├── ceos2.cfg       # AS65001 ASBR（iBGP + eBGP、next-hop-self）
     ├── ceos3.cfg       # AS65002 transit（eBGP only）
@@ -98,8 +104,11 @@ AS-PATH: 65002 65003
 ```bash
 cd ~/git/container_lab/lab03-bgp
 
-# 起動
+# 起動（ハンズオンモード：interface IP のみ設定済み・BGP は手動で入力）
 ./deploy.sh
+
+# 起動（フルコンフィグモード：BGP 含む全設定済み）
+./deploy.sh --full
 
 # 状態確認
 containerlab inspect -t topology.yml
@@ -107,6 +116,44 @@ containerlab inspect -t topology.yml
 # 停止・削除
 ./destroy.sh
 ```
+
+---
+
+## ハンズオンモードの設定タスク
+
+`./deploy.sh`（オプションなし）で起動した場合、各ノードには hostname と interface IP のみ設定されている。
+以下のタスクを自分で設定することがこのラボの目的。
+
+### 全ノード共通
+
+- BGP プロセスを有効化し、自分の AS 番号を設定する
+- `router-id` を Loopback0 のアドレスと同じ値に設定する
+- 各 BGP ピアに対して `neighbor` コマンドで接続先 IP と `remote-as` を設定する
+  - `remote-as` が自分の AS と同じ → iBGP、異なる → eBGP
+- IPv4 アドレスファミリで各ピアを `activate` する
+- Loopback0 のアドレスを BGP で広告（`network` コマンド）する
+
+### ノード別の設定ポイント
+
+| ノード | AS | 役割 | 追加で必要な設定 |
+|--------|----|------|-----------------|
+| ceos1 | 65001 | stub | iBGP ピア（ceos2）のみ設定 |
+| ceos2 | 65001 | ASBR | iBGP（ceos1）と eBGP（ceos3）の両方・ceos1 への `next-hop-self` |
+| ceos3 | 65002 | transit | eBGP（ceos2・ceos4）の両方を設定 |
+| ceos4 | 65003 | ASBR | eBGP（ceos3）と iBGP（ceos5）の両方・ceos5 への `next-hop-self` |
+| ceos5 | 65003 | stub | iBGP ピア（ceos4）のみ設定 |
+
+### next-hop-self が必要な理由
+
+iBGP は受け取った経路の nexthop を書き換えない。
+ceos2 が next-hop-self を設定しないと、ceos1 が受け取る外部経路の nexthop が
+ceos3（10.0.23.2）のままになり、ceos1 はその nexthop に到達できずルートが使われない。
+
+### 設定完了の確認ポイント
+
+- 全ピアで BGP セッションが Established になること
+- ceos1 の BGP テーブルで 5.5.5.5/32 の nexthop が 10.0.12.2（ceos2）になること
+- ceos1 から ceos5 の Loopback（5.5.5.5）へ ping が通ること
 
 ---
 

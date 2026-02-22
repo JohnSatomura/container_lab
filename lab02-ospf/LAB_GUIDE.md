@@ -56,8 +56,16 @@
 ```
 lab02-ospf/
 ├── topology.yml        # containerlab トポロジー定義
+├── deploy.sh           # 起動スクリプト（--full オプションあり）
+├── destroy.sh          # 停止・削除スクリプト
 ├── LAB_GUIDE.md        # このファイル
-└── configs/            # 各ノードの startup-config
+├── configs-init/       # ハンズオンモード用（hostname + interface IP のみ）
+│   ├── ceos1.cfg
+│   ├── ceos2.cfg
+│   ├── ceos3.cfg
+│   ├── ceos4.cfg
+│   └── ceos5.cfg
+└── configs-full/       # フルコンフィグモード用（OSPF 含む完全設定）
     ├── ceos1.cfg       # ABR（Area0 + Area1）
     ├── ceos2.cfg       # ABR（Area0 + Area2）
     ├── ceos3.cfg       # バックボーンルーター（Area0 のみ）
@@ -103,8 +111,11 @@ Area0 の3台は Router Priority がデフォルト（1）のため、**Router I
 ```bash
 cd ~/git/container_lab/lab02-ospf
 
-# 起動（bridge 作成 + containerlab deploy）
+# 起動（ハンズオンモード：interface IP のみ設定済み・OSPF は手動で入力）
 ./deploy.sh
+
+# 起動（フルコンフィグモード：OSPF 含む全設定済み）
+./deploy.sh --full
 
 # 状態確認
 containerlab inspect -t topology.yml
@@ -114,6 +125,36 @@ containerlab inspect -t topology.yml
 ```
 
 > **Note:** WSL2 を再起動すると bridge が消えるが、`./deploy.sh` を実行すれば自動で再作成される。
+
+---
+
+## ハンズオンモードの設定タスク
+
+`./deploy.sh`（オプションなし）で起動した場合、各ノードには hostname と interface IP のみ設定されている。
+以下のタスクを自分で設定することがこのラボの目的。
+
+### 全ノード共通
+
+- OSPF プロセス（プロセス番号: 1）を有効化する
+- `router-id` を Loopback0 のアドレスと同じ値に設定する
+- 各インターフェースが所属するエリアに対して `network` コマンドでアドレスを宣言する
+  - Loopback0 も忘れずにエリアに含める
+
+### ノード別の設定ポイント
+
+| ノード | 役割 | 設定すべきエリア |
+|--------|------|-----------------|
+| ceos1 | ABR | Area0（Et1・Lo0）と Area1（Et2）の両方 |
+| ceos2 | ABR | Area0（Et1・Lo0）と Area2（Et2）の両方 |
+| ceos3 | Backbone | Area0（Et1・Lo0）のみ |
+| ceos4 | Internal | Area1（Et1・Lo0）のみ |
+| ceos5 | Internal | Area2（Et1・Lo0）のみ |
+
+### 設定完了の確認ポイント
+
+- 各ノードで OSPF 隣接関係が FULL になること
+- ceos1・ceos2 が ABR として認識されること
+- ceos4 から ceos5 の Loopback（5.5.5.5）への経路が O IA で見えること
 
 ---
 
