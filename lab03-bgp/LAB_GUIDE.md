@@ -165,7 +165,7 @@ docker exec clab-lab03-bgp-ceos1 /usr/bin/Cli -c "show ip route bgp"
 ### 5. エンドツーエンド ping（ceos1 Lo → ceos5 Lo）
 
 ```bash
-docker exec clab-lab03-bgp-ceos1 /usr/bin/Cli -c "ping 5.5.5.5 source 1.1.1.1"
+docker exec clab-lab03-bgp-ceos1 /usr/bin/Cli -p 15 -c "ping 5.5.5.5 source 1.1.1.1"
 ```
 
 期待される出力：
