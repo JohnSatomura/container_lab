@@ -143,15 +143,15 @@ containerlab version
 
 ---
 
-### [lab03-bgp](./lab03-bgp/LAB_GUIDE.md) — BGP iBGP + eBGP 基礎
+### [lab03-bgp](./lab03-bgp/LAB_GUIDE.md) — BGP 経路制御（マルチホーム・AS-PATH prepend）
 
-**目的:** 3AS 構成で iBGP・eBGP を自分で設定することで、AS 間ルーティングの仕組み・next-hop-self が必要な理由・AS-PATH による経路制御の基本を実感する。DC ネットワークやクラウド接続で必須となる BGP の土台を身につけることが目的。
+**目的:** ISP を2社挟んだマルチホーム構成で iBGP・eBGP を設定し、AS-PATH prepend による経路誘導を実感する。primary/backup の経路設計を通じて、BGP のベストパス選択ルールと経路制御の仕組みを理解することがゴール。
 
 | 項目 | 内容 |
 |------|------|
-| 構成 | 5台・3AS（AS65001/65002/65003）|
-| 台数 | 5台 |
-| ハンズオンで設定すること | `router bgp`（neighbor・remote-as・next-hop-self・network 広告）|
+| 構成 | 6台・4AS（AS65001/65002/65003/65004）マルチホーム |
+| 台数 | 6台 |
+| ハンズオンで設定すること | `router bgp`（neighbor・next-hop-self）+ `route-map` で AS-PATH prepend |
 
 ---
 
