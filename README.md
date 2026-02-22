@@ -155,6 +155,18 @@ containerlab version
 
 ---
 
+### [lab04-ansible](./lab04-ansible/LAB_GUIDE.md) — Ansible による Leaf-Spine OSPF 自動設定
+
+**目的:** 8台の Leaf-Spine 構成に対して Ansible（arista.eos コレクション）で OSPF を一括設定することで、ネットワーク自動化の価値を体感する。手動設定の手間と自動化の効率を比較しながら、inventory/group_vars/host_vars/playbook の構造と eAPI 接続の仕組みを理解することがゴール。
+
+| 項目 | 内容 |
+|------|------|
+| 構成 | Leaf-Spine（Spine×2・Leaf×4・Host×2）|
+| 台数 | 8台 |
+| ハンズオンで設定すること | Ansible playbook で OSPF を一括投入（`eos_config` / `eos_command` モジュール）|
+
+---
+
 ### ラボの起動・停止
 
 全ラボ共通で `deploy.sh` / `destroy.sh` を使って操作する。

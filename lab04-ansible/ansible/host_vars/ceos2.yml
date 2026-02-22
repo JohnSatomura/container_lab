@@ -1,0 +1,13 @@
+# ceos2: Spine2
+ospf_router_id: "2.2.2.2"
+ospf_networks:
+  - prefix: "2.2.2.2/32"
+    area: "0.0.0.0"
+  - prefix: "10.2.0.0/30"
+    area: "0.0.0.0"
+  - prefix: "10.2.0.4/30"
+    area: "0.0.0.0"
+  - prefix: "10.2.0.8/30"
+    area: "0.0.0.0"
+  - prefix: "10.2.0.12/30"
+    area: "0.0.0.0"

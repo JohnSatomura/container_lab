@@ -1,0 +1,28 @@
+---
+# 疎通確認 playbook: Host1(ceos7) から Host2(ceos8) の Loopback0 へ ping
+# 実行: ansible-playbook -i ../inventory.yml verify.yml
+
+- name: 疎通確認（Host1 → Host2）
+  hosts: ceos7
+  gather_facts: false
+
+  tasks:
+    - name: OSPF 隣接関係の確認
+      arista.eos.eos_command:
+        commands:
+          - show ip ospf neighbor
+      register: ospf_neighbor
+
+    - name: OSPF 隣接状態を表示
+      debug:
+        var: ospf_neighbor.stdout_lines
+
+    - name: Host2 の Loopback0（8.8.8.8）へ ping
+      arista.eos.eos_command:
+        commands:
+          - ping 8.8.8.8 source 7.7.7.7 repeat 5
+      register: ping_result
+
+    - name: ping 結果を表示
+      debug:
+        var: ping_result.stdout_lines

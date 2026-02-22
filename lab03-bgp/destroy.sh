@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+cd "$(dirname "$0")"
 
 # containerlab 停止・削除
 containerlab destroy -t topology.yml
