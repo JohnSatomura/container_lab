@@ -1,5 +1,14 @@
 # lab01-basic — 2ノード シンプル接続
 
+## 目的
+
+containerlab と cEOS の基本操作を習得する入門ラボ。ルーティング設定は行わず、以下の点を確認することがゴール。
+
+- containerlab のデプロイ・停止操作（`deploy.sh` / `destroy.sh`）に慣れる
+- EOS CLI へのアクセス方法（`docker exec -it ... Cli`）を習得する
+- コンテナ間のリンクが正しく結線されていることを確認する
+- 後続ラボ（OSPF・BGP）を進めるための土台を作る
+
 ## 概要
 
 Arista cEOS 2台を Ethernet1 で直接接続した、最もシンプルな検証トポロジー。

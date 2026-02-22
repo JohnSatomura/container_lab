@@ -114,13 +114,45 @@ containerlab version
 
 ## 5. ラボ一覧
 
-各ラボの構成図・設定内容・起動手順・確認コマンドは LAB_GUIDE.md を参照。
+各ラボの構成図・設定内容・起動手順・確認コマンドは各 LAB_GUIDE.md を参照。
 
-| ラボ | 概要 |
+---
+
+### [lab01-basic](./lab01-basic/LAB_GUIDE.md) — 2ノード シンプル接続
+
+**目的:** containerlab と cEOS の基本操作を習得する。ルーティング設定は行わず、コンテナの起動・停止・EOS CLI へのアクセス方法を確認することがゴール。後続ラボを進めるための土台として位置付けている。
+
+| 項目 | 内容 |
 |------|------|
-| [lab01-basic](./lab01-basic/LAB_GUIDE.md) | 動作確認用の最小構成。ceos1 -- ceos2 を接続するだけで、ルーティング設定なし |
-| [lab02-ospf](./lab02-ospf/LAB_GUIDE.md) | OSPF 基礎検証（5台）。マルチエリア構成で DR/BDR 選出・ABR 動作・Type3 LSA を確認する |
-| [lab03-bgp](./lab03-bgp/LAB_GUIDE.md) | BGP 基礎検証（5台・3AS）。iBGP/eBGP セッション確立・next-hop-self・AS-PATH 属性を確認する |
+| 構成 | ceos1 -- ceos2（2台直結）|
+| 台数 | 2台 |
+| ハンズオンで設定すること | なし（環境確認のみ）|
+
+---
+
+### [lab02-ospf](./lab02-ospf/LAB_GUIDE.md) — OSPF マルチエリア + DR/BDR
+
+**目的:** OSPF のマルチエリア構成を自分で設定することで、エリア設計の考え方・DR/BDR 選出のメカニズム・ABR がどのようにエリア間でルートを伝播するかを体験的に理解する。単に覚えるだけでなく「なぜそう動くか」を実機に近い環境で確認できる。
+
+| 項目 | 内容 |
+|------|------|
+| 構成 | 5台・3エリア（Area0/1/2）|
+| 台数 | 5台 |
+| ハンズオンで設定すること | `router ospf`（router-id・network コマンド・エリア割り当て）|
+
+---
+
+### [lab03-bgp](./lab03-bgp/LAB_GUIDE.md) — BGP iBGP + eBGP 基礎
+
+**目的:** 3AS 構成で iBGP・eBGP を自分で設定することで、AS 間ルーティングの仕組み・next-hop-self が必要な理由・AS-PATH による経路制御の基本を実感する。DC ネットワークやクラウド接続で必須となる BGP の土台を身につけることが目的。
+
+| 項目 | 内容 |
+|------|------|
+| 構成 | 5台・3AS（AS65001/65002/65003）|
+| 台数 | 5台 |
+| ハンズオンで設定すること | `router bgp`（neighbor・remote-as・next-hop-self・network 広告）|
+
+---
 
 ### ラボの起動・停止
 
