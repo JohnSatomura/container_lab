@@ -81,11 +81,13 @@ BGP 経路が eBGP を通過するたびに AS 番号が先頭に追加される
 ceos1 から見た ceos5（5.5.5.5/32）の AS-PATH は以下のようになる：
 
 ```
-AS-PATH: 65001 65002 65003
-         ↑          ↑
-         ceos2 が   ceos4 が
+AS-PATH: 65002 65003
+         ↑     ↑
+         ceos3 が   ceos4 が
          追加        追加
 ```
+
+> **Note:** iBGP（同一 AS 内）では AS 番号は付加されない。AS65001 は ceos1 視点では AS-PATH に現れない。
 
 ---
 
@@ -158,8 +160,11 @@ BGP routing table entry for 5.5.5.5/32
 ### 4. ルーティングテーブル確認
 
 ```bash
-# ceos1 に B E（eBGP 由来）と B I（iBGP 由来）の経路が入っているか
+# ceos1：iBGP ピアしか持たないため全経路が B I（iBGP 由来）で表示される
 docker exec clab-lab03-bgp-ceos1 /usr/bin/Cli -c "show ip route bgp"
+
+# ceos2：eBGP（ceos3）から受けた経路が B E、iBGP（ceos1）から受けた経路が B I で表示される
+docker exec clab-lab03-bgp-ceos2 /usr/bin/Cli -c "show ip route bgp"
 ```
 
 ### 5. エンドツーエンド ping（ceos1 Lo → ceos5 Lo）
@@ -172,7 +177,7 @@ docker exec clab-lab03-bgp-ceos1 /usr/bin/Cli -p 15 -c "ping 5.5.5.5 source 1.1.
 
 ```
 PING 5.5.5.5 (5.5.5.5) from 1.1.1.1 : 72(100) bytes of data.
-80 bytes from 5.5.5.5: icmp_seq=1 ttl=62 time=... ms
+80 bytes from 5.5.5.5: icmp_seq=1 ttl=61 time=... ms
 ...
 5 packets transmitted, 5 received, 0% packet loss
 ```
