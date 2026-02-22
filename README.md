@@ -115,6 +115,7 @@ containerlab version
 ## 5. ラボ一覧
 
 各ラボの構成図・設定内容・起動手順・確認コマンドは各 LAB_GUIDE.md を参照。
+よく使うコマンドは [CLI_REFERENCE.md](./CLI_REFERENCE.md) にまとめている。
 
 ---
 
