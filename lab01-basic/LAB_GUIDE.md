@@ -44,11 +44,19 @@ Arista cEOS 2台を Ethernet1 で直接接続した、最もシンプルな検�
 ```
 lab01-basic/
 ├── topology.yml          # containerlab トポロジー定義
+├── deploy.sh             # 起動スクリプト（--full オプションあり）
+├── destroy.sh            # 停止・削除スクリプト
 ├── LAB_GUIDE.md          # このファイル（構成図・設定内容・操作手順）
-└── clab-lab01-basic/     # deploy 後に自動生成されるディレクトリ（Git 管理外）
-    ├── ceos1/flash/      # ceos1 の設定・ログ
-    └── ceos2/flash/      # ceos2 の設定・ログ
+├── configs-init/         # 練習モード用（hostname のみ）
+│   ├── ceos1.cfg
+│   └── ceos2.cfg
+└── configs-full/         # 設定済みモード用（lab01 は init と同一）
+    ├── ceos1.cfg
+    └── ceos2.cfg
 ```
+
+> **Note:** lab01-basic はルーティング設定がないため、configs-init と configs-full の内容は同一。
+> `--full` オプションは lab02 以降で意味を持つ。
 
 ---
 
