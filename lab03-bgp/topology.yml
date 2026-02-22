@@ -5,23 +5,23 @@ topology:
     ceos1:
       kind: ceos
       image: ceos:4.34.4M
-      startup-config: configs/ceos1.cfg
+      startup-config: configs-init/ceos1.cfg
     ceos2:
       kind: ceos
       image: ceos:4.34.4M
-      startup-config: configs/ceos2.cfg
+      startup-config: configs-init/ceos2.cfg
     ceos3:
       kind: ceos
       image: ceos:4.34.4M
-      startup-config: configs/ceos3.cfg
+      startup-config: configs-init/ceos3.cfg
     ceos4:
       kind: ceos
       image: ceos:4.34.4M
-      startup-config: configs/ceos4.cfg
+      startup-config: configs-init/ceos4.cfg
     ceos5:
       kind: ceos
       image: ceos:4.34.4M
-      startup-config: configs/ceos5.cfg
+      startup-config: configs-init/ceos5.cfg
 
   links:
     - endpoints: ["ceos1:eth1", "ceos2:eth1"]   # AS65001 内 iBGP
