@@ -1,0 +1,17 @@
+# spine1: Spine1 (AS65000, Loopback: 1.1.1.1)
+bgp_router_id: "1.1.1.1"
+loopback_network: "1.1.1.1/32"
+
+# アンダーレイ eBGP ピア (Leaf の P2P リンク IP)
+leaf_underlay_peers:
+  - ip: "10.1.0.2"
+    remote_as: 65001
+  - ip: "10.1.0.6"
+    remote_as: 65002
+
+# オーバーレイ EVPN eBGP ピア (Leaf の Loopback IP)
+leaf_overlay_peers:
+  - ip: "3.3.3.3"
+    remote_as: 65001
+  - ip: "4.4.4.4"
+    remote_as: 65002

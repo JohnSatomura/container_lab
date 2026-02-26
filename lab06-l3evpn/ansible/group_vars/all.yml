@@ -1,0 +1,10 @@
+# Arista EOS への eAPI (HTTP) 接続共通設定
+ansible_connection: httpapi
+ansible_httpapi_use_ssl: false
+ansible_httpapi_validate_certs: false
+ansible_httpapi_port: 80
+ansible_network_os: arista.eos.eos
+ansible_user: admin
+ansible_password: "admin"
+ansible_become: true
+ansible_become_method: enable

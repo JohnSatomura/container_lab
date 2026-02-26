@@ -1,0 +1,61 @@
+# leaf1: Leaf1 (AS65001, Loopback: 3.3.3.3)
+bgp_as: 65001
+bgp_router_id: "3.3.3.3"
+loopback_network: "3.3.3.3/32"
+
+# アンダーレイ eBGP ピア (Spine の P2P リンク IP)
+spine_underlay_peers:
+  - ip: "10.1.0.1"
+    remote_as: 65000
+  - ip: "10.2.0.1"
+    remote_as: 65000
+
+# VRF 設定
+vrfs:
+  - name: TENANT_A
+    l3vni: 50001
+    transit_vlan: 100
+    rd_suffix: "100"
+    rt: "100:100"
+  - name: TENANT_B
+    l3vni: 50002
+    transit_vlan: 110
+    rd_suffix: "200"
+    rt: "200:200"
+
+# VLAN データベース (L2 + L3VNI transit)
+vlans: [10, 30, 100, 110]
+
+# アクセスポート設定 (ホスト接続インターフェース)
+access_ports:
+  - interface: Ethernet3
+    vlan: 10
+  - interface: Ethernet4
+    vlan: 30
+
+# Anycast GW SVI (VRF 内ゲートウェイ)
+anycast_svs:
+  - vlan: 10
+    vrf: TENANT_A
+    ip: "192.168.10.254/24"
+  - vlan: 30
+    vrf: TENANT_B
+    ip: "192.168.30.254/24"
+
+# L3VNI transit SVI (VRF-VNI マッピング用)
+l3vni_svs:
+  - vlan: 100
+    vrf: TENANT_A
+  - vlan: 110
+    vrf: TENANT_B
+
+# VXLAN L2VNI マッピング
+vxlan_l2vnis:
+  - vlan: 10
+    vni: 10010
+    rd: "3.3.3.3:10010"
+    rt: "65001:10010"
+  - vlan: 30
+    vni: 10030
+    rd: "3.3.3.3:10030"
+    rt: "65001:10030"
