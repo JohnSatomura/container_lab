@@ -99,11 +99,31 @@ ip virtual-router mac-address 00:1c:73:00:00:01
 
 ## デプロイ手順
 
-### フルコンフィグモード (推奨 - 動作確認のみ)
+### フルモード (推奨 - Ansible が L3 EVPN 設定を自動投入)
 
 ```bash
 cd lab06-l3evpn
 ./deploy.sh --full
+```
+
+処理の流れ:
+1. `ansible-eos` Docker イメージをビルド (python:3.11-slim + ansible + arista.eos)
+2. `containerlab deploy` で全ノードを configs-init で起動
+3. `ansible-lab06` コンテナを起動
+4. 全ノードの eAPI 起動を待機
+5. `site.yml` を実行して L3 EVPN 設定を一括投入
+
+完了後の操作:
+
+```bash
+# Ansible コンテナにログイン
+docker exec -it ansible-lab06 bash
+
+# 動作確認 playbook を実行
+docker exec ansible-lab06 ansible-playbook -i /ansible/inventory.yml /ansible/playbooks/verify.yml
+
+# 設定を再投入したい場合
+docker exec ansible-lab06 ansible-playbook -i /ansible/inventory.yml /ansible/playbooks/site.yml
 ```
 
 ### ハンズオンモード (手動設定練習)
@@ -115,6 +135,8 @@ cd lab06-l3evpn
 
 init 設定: Spine は P2P IP アドレスのみ。Leaf は Loopback + P2P IP のみ。
 BGP / EVPN / VRF / VLAN / VXLAN は手動で設定する。
+
+`ansible-lab06` コンテナのみ起動しており、設定投入は行われない。手動設定後に verify.yml で確認できる。
 
 ---
 
@@ -338,3 +360,9 @@ docker exec -it clab-lab06-l3evpn-ceos5 Cli -p 15 -c "ping 192.168.30.10 source 
 ```bash
 ./destroy.sh
 ```
+
+以下をまとめて削除する:
+- containerlab ノード全台
+- `ansible-lab06` コンテナ
+- `ansible-eos` Docker イメージ
+- `clab-lab06-l3evpn/` ディレクトリ
