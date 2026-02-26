@@ -1,0 +1,99 @@
+---
+# L3 EVPN 動作確認 playbook
+# 実行: ansible-playbook -i ../inventory.yml verify.yml
+
+# ============================================================
+# Play 1: Spine - アンダーレイ BGP セッション確認
+# ============================================================
+- name: Spine アンダーレイ BGP 確認
+  hosts: spine
+  gather_facts: false
+
+  tasks:
+    - name: BGP セッション状態確認
+      arista.eos.eos_command:
+        commands:
+          - show bgp summary
+      register: bgp_summary
+
+    - name: BGP セッション結果表示
+      debug:
+        msg: "{{ inventory_hostname }}: {{ bgp_summary.stdout_lines }}"
+
+# ============================================================
+# Play 2: Leaf - EVPN / VXLAN / VRF 確認
+# ============================================================
+- name: Leaf EVPN / VXLAN / VRF 確認
+  hosts: leaf
+  gather_facts: false
+
+  tasks:
+    - name: EVPN BGP セッション確認
+      arista.eos.eos_command:
+        commands:
+          - show bgp evpn summary
+      register: evpn_summary
+
+    - name: EVPN セッション結果表示
+      debug:
+        msg: "{{ inventory_hostname }}: {{ evpn_summary.stdout_lines }}"
+
+    - name: VNI マッピング確認 (L2VNI + L3VNI)
+      arista.eos.eos_command:
+        commands:
+          - show vxlan vni
+      register: vxlan_vni
+
+    - name: VNI マッピング結果表示
+      debug:
+        msg: "{{ inventory_hostname }}: {{ vxlan_vni.stdout_lines }}"
+
+    - name: Type-5 IP Prefix ルート確認
+      arista.eos.eos_command:
+        commands:
+          - show bgp evpn route-type ip-prefix ipv4
+      register: type5_routes
+
+    - name: Type-5 ルート結果表示
+      debug:
+        msg: "{{ inventory_hostname }}: {{ type5_routes.stdout_lines }}"
+
+    - name: VRF ルーティングテーブル確認
+      arista.eos.eos_command:
+        commands:
+          - "show ip route vrf {{ item.name }}"
+      loop: "{{ vrfs }}"
+      register: vrf_routes
+
+    - name: VRF ルーティングテーブル表示
+      debug:
+        msg: "{{ inventory_hostname }} VRF {{ item.item.name }}: {{ item.stdout_lines }}"
+      loop: "{{ vrf_routes.results }}"
+
+# ============================================================
+# Play 3: Host1 - E2E 疎通確認
+# ============================================================
+- name: E2E 疎通確認
+  hosts: ceos5
+  gather_facts: false
+
+  tasks:
+    - name: "[成功期待] Host1 -> Host2 ping (TENANT_A L3 EVPN ルーティング)"
+      arista.eos.eos_command:
+        commands:
+          - ping 192.168.20.10 source 192.168.10.10 repeat 5
+      register: ping_h1_h2
+
+    - name: Host1 -> Host2 ping 結果表示
+      debug:
+        msg: "{{ ping_h1_h2.stdout_lines }}"
+
+    - name: "[失敗期待] Host1 -> Host3 ping (VRF 分離 - 到達不可)"
+      arista.eos.eos_command:
+        commands:
+          - ping 192.168.30.10 source 192.168.10.10 repeat 3
+      register: ping_h1_h3
+
+    - name: Host1 -> Host3 ping 結果表示 (Destination Unreachable が期待値)
+      debug:
+        msg: "{{ ping_h1_h3.stdout_lines }}"

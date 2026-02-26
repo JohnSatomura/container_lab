@@ -1,0 +1,11 @@
+# Leaf ノード (ceos3, ceos4) 共通変数
+
+# 全 Leaf で共通の Anycast Gateway MAC アドレス
+anycast_gw_mac: "00:1c:73:00:00:01"
+
+# EVPN オーバーレイピア (Spine Loopback) - 全 Leaf 共通
+spine_overlay_peers:
+  - ip: "1.1.1.1"
+    remote_as: 65000
+  - ip: "2.2.2.2"
+    remote_as: 65000

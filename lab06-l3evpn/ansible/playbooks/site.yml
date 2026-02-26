@@ -1,0 +1,273 @@
+---
+# L3 EVPN 設定投入 playbook
+# 前提: ./deploy.sh (--full なし) で起動済み (configs-init 適用済み)
+# 実行: ansible-playbook -i ../inventory.yml site.yml
+
+# ============================================================
+# Play 1: Spine - BGP アンダーレイ + EVPN オーバーレイ設定
+# ============================================================
+- name: Spine BGP 設定
+  hosts: spine
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: BGP プロセス基本設定
+      arista.eos.eos_config:
+        lines:
+          - "router-id {{ bgp_router_id }}"
+          - "no bgp default ipv4-unicast"
+        parents: "router bgp {{ bgp_as }}"
+
+    - name: アンダーレイ peer-group (LEAF_UNDERLAY) 設定
+      arista.eos.eos_config:
+        lines:
+          - "neighbor LEAF_UNDERLAY peer group"
+          - "neighbor LEAF_UNDERLAY send-community extended"
+        parents: "router bgp {{ bgp_as }}"
+
+    - name: オーバーレイ peer-group (LEAF_OVERLAY) 設定
+      arista.eos.eos_config:
+        lines:
+          - "neighbor LEAF_OVERLAY peer group"
+          - "neighbor LEAF_OVERLAY ebgp-multihop 3"
+          - "neighbor LEAF_OVERLAY update-source Loopback0"
+          - "neighbor LEAF_OVERLAY send-community extended"
+          - "neighbor LEAF_OVERLAY next-hop-unchanged"
+        parents: "router bgp {{ bgp_as }}"
+
+    - name: アンダーレイ eBGP ピア設定
+      arista.eos.eos_config:
+        lines:
+          - "neighbor {{ item.ip }} peer group LEAF_UNDERLAY"
+          - "neighbor {{ item.ip }} remote-as {{ item.remote_as }}"
+        parents: "router bgp {{ bgp_as }}"
+      loop: "{{ leaf_underlay_peers }}"
+
+    - name: オーバーレイ EVPN eBGP ピア設定
+      arista.eos.eos_config:
+        lines:
+          - "neighbor {{ item.ip }} peer group LEAF_OVERLAY"
+          - "neighbor {{ item.ip }} remote-as {{ item.remote_as }}"
+        parents: "router bgp {{ bgp_as }}"
+      loop: "{{ leaf_overlay_peers }}"
+
+    - name: address-family ipv4 (アンダーレイ有効化 + Loopback 広告)
+      arista.eos.eos_config:
+        lines:
+          - "neighbor LEAF_UNDERLAY activate"
+          - "network {{ loopback_network }}"
+        parents:
+          - "router bgp {{ bgp_as }}"
+          - "address-family ipv4"
+
+    - name: address-family evpn (オーバーレイ有効化)
+      arista.eos.eos_config:
+        lines:
+          - "neighbor LEAF_OVERLAY activate"
+        parents:
+          - "router bgp {{ bgp_as }}"
+          - "address-family evpn"
+
+# ============================================================
+# Play 2: Leaf - VRF / VLAN / VXLAN / BGP EVPN 設定
+# ============================================================
+- name: Leaf VRF / VXLAN / BGP EVPN 設定
+  hosts: leaf
+  gather_facts: false
+  become: true
+
+  tasks:
+    # --- VRF ---
+    - name: VRF インスタンス作成
+      arista.eos.eos_config:
+        lines:
+          - "vrf instance {{ item.name }}"
+      loop: "{{ vrfs }}"
+
+    # ip routing vrf は vrf instance 作成後に設定する (cEOS 順序依存)
+    - name: VRF の IP ルーティング有効化
+      arista.eos.eos_config:
+        lines:
+          - "ip routing vrf {{ item.name }}"
+      loop: "{{ vrfs }}"
+
+    # --- Anycast GW ---
+    - name: Anycast Gateway MAC アドレス設定
+      arista.eos.eos_config:
+        lines:
+          - "ip virtual-router mac-address {{ anycast_gw_mac }}"
+
+    # --- VLAN ---
+    - name: VLAN データベース設定
+      arista.eos.eos_config:
+        lines:
+          - "vlan {{ vlans | join(',') }}"
+
+    # --- アクセスポート ---
+    - name: ホスト接続アクセスポート設定
+      arista.eos.eos_config:
+        lines:
+          - "switchport access vlan {{ item.vlan }}"
+        parents: "interface {{ item.interface }}"
+      loop: "{{ access_ports }}"
+
+    # --- Anycast GW SVI ---
+    - name: Anycast GW SVI 設定 (VRF + virtual IP)
+      arista.eos.eos_config:
+        lines:
+          - "vrf {{ item.vrf }}"
+          - "ip address virtual {{ item.ip }}"
+        parents: "interface Vlan{{ item.vlan }}"
+      loop: "{{ anycast_svs }}"
+
+    # --- L3VNI transit SVI ---
+    - name: L3VNI transit SVI 設定 (VRF + unnumbered)
+      arista.eos.eos_config:
+        lines:
+          - "vrf {{ item.vrf }}"
+          - "ip address unnumbered Loopback0"
+        parents: "interface Vlan{{ item.vlan }}"
+      loop: "{{ l3vni_svs }}"
+
+    # --- VXLAN ---
+    - name: Vxlan1 インターフェース基本設定
+      arista.eos.eos_config:
+        lines:
+          - "vxlan source-interface Loopback0"
+          - "vxlan udp-port 4789"
+        parents: "interface Vxlan1"
+
+    - name: L2VNI マッピング設定 (VLAN -> VNI)
+      arista.eos.eos_config:
+        lines:
+          - "vxlan vlan {{ item.vlan }} vni {{ item.vni }}"
+        parents: "interface Vxlan1"
+      loop: "{{ vxlan_l2vnis }}"
+
+    - name: L3VNI マッピング設定 (VRF -> VNI)
+      arista.eos.eos_config:
+        lines:
+          - "vxlan vrf {{ item.name }} vni {{ item.l3vni }}"
+        parents: "interface Vxlan1"
+      loop: "{{ vrfs }}"
+
+    # --- BGP 基本 ---
+    - name: BGP プロセス基本設定
+      arista.eos.eos_config:
+        lines:
+          - "router-id {{ bgp_router_id }}"
+          - "no bgp default ipv4-unicast"
+        parents: "router bgp {{ bgp_as }}"
+
+    - name: アンダーレイ peer-group (SPINE_UNDERLAY) 設定
+      arista.eos.eos_config:
+        lines:
+          - "neighbor SPINE_UNDERLAY peer group"
+          - "neighbor SPINE_UNDERLAY send-community extended"
+        parents: "router bgp {{ bgp_as }}"
+
+    - name: オーバーレイ peer-group (SPINE_OVERLAY) 設定
+      arista.eos.eos_config:
+        lines:
+          - "neighbor SPINE_OVERLAY peer group"
+          - "neighbor SPINE_OVERLAY ebgp-multihop 3"
+          - "neighbor SPINE_OVERLAY update-source Loopback0"
+          - "neighbor SPINE_OVERLAY send-community extended"
+        parents: "router bgp {{ bgp_as }}"
+
+    - name: アンダーレイ eBGP ピア設定
+      arista.eos.eos_config:
+        lines:
+          - "neighbor {{ item.ip }} peer group SPINE_UNDERLAY"
+          - "neighbor {{ item.ip }} remote-as {{ item.remote_as }}"
+        parents: "router bgp {{ bgp_as }}"
+      loop: "{{ spine_underlay_peers }}"
+
+    - name: オーバーレイ EVPN eBGP ピア設定
+      arista.eos.eos_config:
+        lines:
+          - "neighbor {{ item.ip }} peer group SPINE_OVERLAY"
+          - "neighbor {{ item.ip }} remote-as {{ item.remote_as }}"
+        parents: "router bgp {{ bgp_as }}"
+      loop: "{{ spine_overlay_peers }}"
+
+    # --- BGP L2VNI (Type-2/3) ---
+    - name: BGP L2VNI 設定 (RD / RT / redistribute learned)
+      arista.eos.eos_config:
+        lines:
+          - "rd {{ item.rd }}"
+          - "route-target import {{ item.rt }}"
+          - "route-target export {{ item.rt }}"
+          - "redistribute learned"
+        parents:
+          - "router bgp {{ bgp_as }}"
+          - "vlan {{ item.vlan }}"
+      loop: "{{ vxlan_l2vnis }}"
+
+    # --- BGP address-family ---
+    - name: address-family ipv4 (アンダーレイ有効化 + Loopback 広告)
+      arista.eos.eos_config:
+        lines:
+          - "neighbor SPINE_UNDERLAY activate"
+          - "network {{ loopback_network }}"
+        parents:
+          - "router bgp {{ bgp_as }}"
+          - "address-family ipv4"
+
+    - name: address-family evpn (オーバーレイ有効化)
+      arista.eos.eos_config:
+        lines:
+          - "neighbor SPINE_OVERLAY activate"
+        parents:
+          - "router bgp {{ bgp_as }}"
+          - "address-family evpn"
+
+    # --- BGP L3VNI / VRF (Type-5) ---
+    - name: BGP VRF 設定 (RD / RT / redistribute connected)
+      arista.eos.eos_config:
+        lines:
+          - "rd {{ bgp_router_id }}:{{ item.rd_suffix }}"
+          - "route-target import evpn {{ item.rt }}"
+          - "route-target export evpn {{ item.rt }}"
+          - "redistribute connected"
+        parents:
+          - "router bgp {{ bgp_as }}"
+          - "vrf {{ item.name }}"
+      loop: "{{ vrfs }}"
+
+# ============================================================
+# Play 3: Host - VLAN / IP / デフォルトルート設定
+# ============================================================
+- name: Host 設定
+  hosts: host
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: IP ルーティング有効化
+      arista.eos.eos_config:
+        lines:
+          - "ip routing"
+
+    - name: VLAN 作成
+      arista.eos.eos_config:
+        lines:
+          - "vlan {{ host_vlan }}"
+
+    - name: Ethernet1 アクセスポート設定
+      arista.eos.eos_config:
+        lines:
+          - "switchport access vlan {{ host_vlan }}"
+        parents: "interface Ethernet1"
+
+    - name: SVI IP アドレス設定
+      arista.eos.eos_config:
+        lines:
+          - "ip address {{ host_ip }}"
+        parents: "interface Vlan{{ host_vlan }}"
+
+    - name: デフォルトルート設定
+      arista.eos.eos_config:
+        lines:
+          - "ip route 0.0.0.0/0 {{ host_gw }}"

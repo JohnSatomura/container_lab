@@ -1,0 +1,45 @@
+# ceos4: Leaf2 (AS65002, Loopback: 4.4.4.4)
+bgp_as: 65002
+bgp_router_id: "4.4.4.4"
+loopback_network: "4.4.4.4/32"
+
+# アンダーレイ eBGP ピア (Spine の P2P リンク IP)
+spine_underlay_peers:
+  - ip: "10.1.0.5"
+    remote_as: 65000
+  - ip: "10.2.0.5"
+    remote_as: 65000
+
+# VRF 設定
+vrfs:
+  - name: TENANT_A
+    l3vni: 50001
+    transit_vlan: 100
+    rd_suffix: "100"
+    rt: "100:100"
+
+# VLAN データベース (L2 + L3VNI transit)
+vlans: [20, 100]
+
+# アクセスポート設定 (ホスト接続インターフェース)
+access_ports:
+  - interface: Ethernet3
+    vlan: 20
+
+# Anycast GW SVI (VRF 内ゲートウェイ)
+anycast_svs:
+  - vlan: 20
+    vrf: TENANT_A
+    ip: "192.168.20.254/24"
+
+# L3VNI transit SVI (VRF-VNI マッピング用)
+l3vni_svs:
+  - vlan: 100
+    vrf: TENANT_A
+
+# VXLAN L2VNI マッピング
+vxlan_l2vnis:
+  - vlan: 20
+    vni: 10020
+    rd: "4.4.4.4:10020"
+    rt: "65002:10020"
