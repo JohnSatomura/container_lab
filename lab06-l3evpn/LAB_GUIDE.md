@@ -138,6 +138,11 @@ BGP / EVPN / VRF / VLAN / VXLAN は手動で設定する。
 
 `ansible-lab06` コンテナのみ起動しており、設定投入は行われない。手動設定後に verify.yml で確認できる。
 
+完成形の設定は `configs-full/` を参照:
+- `configs-full/ceos1.cfg`, `ceos2.cfg`: Spine の BGP 設定
+- `configs-full/ceos3.cfg`, `ceos4.cfg`: Leaf の VRF / VXLAN / BGP EVPN 設定
+- `configs-full/ceos5.cfg`, `ceos6.cfg`, `ceos7.cfg`: Host の VLAN / IP 設定
+
 ---
 
 ## 検証コマンド
