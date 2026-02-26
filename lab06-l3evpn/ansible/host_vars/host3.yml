@@ -1,4 +1,4 @@
-# ceos7: Host3 (TENANT_B, 192.168.30.10)
+# host3: Host3 (TENANT_B, 192.168.30.10)
 host_vlan: 30
 host_ip: "192.168.30.10/24"
 host_gw: "192.168.30.254"

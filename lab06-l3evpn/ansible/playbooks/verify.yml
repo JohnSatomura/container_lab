@@ -74,7 +74,7 @@
 # Play 3: Host1 - E2E 疎通確認
 # ============================================================
 - name: E2E 疎通確認
-  hosts: ceos5
+  hosts: host1
   gather_facts: false
 
   tasks:

@@ -1,4 +1,4 @@
-# ceos2: Spine2 (AS65000, Loopback: 2.2.2.2)
+# spine2: Spine2 (AS65000, Loopback: 2.2.2.2)
 bgp_router_id: "2.2.2.2"
 loopback_network: "2.2.2.2/32"
 

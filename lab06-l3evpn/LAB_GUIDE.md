@@ -17,34 +17,34 @@ VRF による L3 テナント分離と、BGP EVPN Type-5 (IP Prefix) ルート�
 ## トポロジ
 
 ```
-      [Spine1:ceos1 AS65000]      [Spine2:ceos2 AS65000]
+      [Spine1 AS65000]      [Spine2 AS65000]
       Lo0:1.1.1.1                  Lo0:2.2.2.2
        Et1:10.1.0.1  Et2:10.1.0.5   Et1:10.2.0.1  Et2:10.2.0.5
             |              |               |               |
        10.1.0.2       10.1.0.6       10.2.0.2        10.2.0.6
-      [Leaf1:ceos3 AS65001]          [Leaf2:ceos4 AS65002]
+      [Leaf1 AS65001]                [Leaf2 AS65002]
       Lo0:3.3.3.3                     Lo0:4.4.4.4
       VLAN10 GW:192.168.10.254        VLAN20 GW:192.168.20.254
       VLAN30 GW:192.168.30.254
            |         |                       |
         Et3(VLAN10) Et4(VLAN30)           Et3(VLAN20)
            |         |                       |
-      [Host1:ceos5] [Host3:ceos7]      [Host2:ceos6]
+      [Host1]       [Host3]           [Host2]
       192.168.10.10  192.168.30.10      192.168.20.10
       (TENANT_A)     (TENANT_B)         (TENANT_A)
 ```
 
 ### ノード一覧
 
-| Node  | 役割   | AS    | Lo0     | 備考 |
-|-------|--------|-------|---------|------|
-| ceos1 | Spine1 | 65000 | 1.1.1.1 | アンダーレイ+オーバーレイ集約 |
-| ceos2 | Spine2 | 65000 | 2.2.2.2 | 冗長 |
-| ceos3 | Leaf1  | 65001 | 3.3.3.3 | TENANT_A VLAN10 + TENANT_B VLAN30 |
-| ceos4 | Leaf2  | 65002 | 4.4.4.4 | TENANT_A VLAN20 |
-| ceos5 | Host1  | -     | -       | TENANT_A / 192.168.10.10/24 |
-| ceos6 | Host2  | -     | -       | TENANT_A / 192.168.20.10/24 |
-| ceos7 | Host3  | -     | -       | TENANT_B / 192.168.30.10/24 |
+| Node   | 役割   | AS    | Lo0     | 備考 |
+|--------|--------|-------|---------|------|
+| spine1 | Spine1 | 65000 | 1.1.1.1 | アンダーレイ+オーバーレイ集約 |
+| spine2 | Spine2 | 65000 | 2.2.2.2 | 冗長 |
+| leaf1  | Leaf1  | 65001 | 3.3.3.3 | TENANT_A VLAN10 + TENANT_B VLAN30 |
+| leaf2  | Leaf2  | 65002 | 4.4.4.4 | TENANT_A VLAN20 |
+| host1  | Host1  | -     | -       | TENANT_A / 192.168.10.10/24 |
+| host2  | Host2  | -     | -       | TENANT_A / 192.168.20.10/24 |
+| host3  | Host3  | -     | -       | TENANT_B / 192.168.30.10/24 |
 
 ### リンク構成
 
@@ -139,9 +139,9 @@ BGP / EVPN / VRF / VLAN / VXLAN は手動で設定する。
 `ansible-lab06` コンテナのみ起動しており、設定投入は行われない。手動設定後に verify.yml で確認できる。
 
 完成形の設定は `configs-full/` を参照:
-- `configs-full/ceos1.cfg`, `ceos2.cfg`: Spine の BGP 設定
-- `configs-full/ceos3.cfg`, `ceos4.cfg`: Leaf の VRF / VXLAN / BGP EVPN 設定
-- `configs-full/ceos5.cfg`, `ceos6.cfg`, `ceos7.cfg`: Host の VLAN / IP 設定
+- `configs-full/spine1.cfg`, `spine2.cfg`: Spine の BGP 設定
+- `configs-full/leaf1.cfg`, `leaf2.cfg`: Leaf の VRF / VXLAN / BGP EVPN 設定
+- `configs-full/host1.cfg`, `host2.cfg`, `host3.cfg`: Host の VLAN / IP 設定
 
 ---
 
@@ -151,34 +151,34 @@ BGP / EVPN / VRF / VLAN / VXLAN は手動で設定する。
 
 ```bash
 # Spine1 で Leaf の Loopback が学習されていること
-docker exec -it clab-lab06-l3evpn-ceos1 Cli -p 15 -c "show bgp summary"
-docker exec -it clab-lab06-l3evpn-ceos1 Cli -p 15 -c "show ip route"
+docker exec -it clab-lab06-l3evpn-spine1 Cli -p 15 -c "show bgp summary"
+docker exec -it clab-lab06-l3evpn-spine1 Cli -p 15 -c "show ip route"
 
 # Leaf1 で Spine 経由の Loopback 到達性確認
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "ping 4.4.4.4 source 3.3.3.3"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "ping 4.4.4.4 source 3.3.3.3"
 ```
 
 ### Step 2: オーバーレイ確認 (BGP EVPN セッション)
 
 ```bash
 # Leaf1 の EVPN ピア確認
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show bgp evpn summary"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show bgp evpn summary"
 
 # Leaf2 の EVPN ピア確認
-docker exec -it clab-lab06-l3evpn-ceos4 Cli -p 15 -c "show bgp evpn summary"
+docker exec -it clab-lab06-l3evpn-leaf2 Cli -p 15 -c "show bgp evpn summary"
 ```
 
 ### Step 3: VRF / VXLAN 確認
 
 ```bash
 # Leaf1 の VRF 状態
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show vrf"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show vrf"
 
 # Leaf1 の VNI マッピング (L2VNI + L3VNI が表示されること)
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show vxlan vni"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show vxlan vni"
 
 # Leaf2 の VNI マッピング
-docker exec -it clab-lab06-l3evpn-ceos4 Cli -p 15 -c "show vxlan vni"
+docker exec -it clab-lab06-l3evpn-leaf2 Cli -p 15 -c "show vxlan vni"
 ```
 
 ### Step 4: Type-5 ルート確認
@@ -186,11 +186,11 @@ docker exec -it clab-lab06-l3evpn-ceos4 Cli -p 15 -c "show vxlan vni"
 ```bash
 # Leaf1 で TENANT_A の IP Prefix (Type-5) ルートを確認
 # 192.168.20.0/24 (Leaf2 側) が学習されていること
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show bgp evpn route-type ip-prefix"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show bgp evpn route-type ip-prefix"
 
 # Leaf2 で TENANT_A の IP Prefix ルートを確認
 # 192.168.10.0/24 (Leaf1 側) が学習されていること
-docker exec -it clab-lab06-l3evpn-ceos4 Cli -p 15 -c "show bgp evpn route-type ip-prefix"
+docker exec -it clab-lab06-l3evpn-leaf2 Cli -p 15 -c "show bgp evpn route-type ip-prefix"
 ```
 
 ### Step 5: VRF ルーティングテーブル確認
@@ -198,27 +198,27 @@ docker exec -it clab-lab06-l3evpn-ceos4 Cli -p 15 -c "show bgp evpn route-type i
 ```bash
 # Leaf1 TENANT_A ルーティングテーブル
 # 192.168.20.0/24 が EVPN 経由 (VTEP: 4.4.4.4) で存在すること
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show ip route vrf TENANT_A"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_A"
 
 # Leaf1 TENANT_B ルーティングテーブル
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show ip route vrf TENANT_B"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_B"
 
 # Leaf2 TENANT_A ルーティングテーブル
 # 192.168.10.0/24 が EVPN 経由 (VTEP: 3.3.3.3) で存在すること
-docker exec -it clab-lab06-l3evpn-ceos4 Cli -p 15 -c "show ip route vrf TENANT_A"
+docker exec -it clab-lab06-l3evpn-leaf2 Cli -p 15 -c "show ip route vrf TENANT_A"
 ```
 
 ### Step 6: エンドツーエンド疎通確認
 
 ```bash
 # [成功] Host1(TENANT_A) -> Host2(TENANT_A): 異なるサブネット間 L3 EVPN ルーティング
-docker exec -it clab-lab06-l3evpn-ceos5 Cli -p 15 -c "ping 192.168.20.10 source 192.168.10.10"
+docker exec -it clab-lab06-l3evpn-host1 Cli -p 15 -c "ping 192.168.20.10 source 192.168.10.10"
 
 # [失敗] Host1(TENANT_A) -> Host3(TENANT_B): VRF 分離 - 到達不可であること
-docker exec -it clab-lab06-l3evpn-ceos5 Cli -p 15 -c "ping 192.168.30.10 source 192.168.10.10"
+docker exec -it clab-lab06-l3evpn-host1 Cli -p 15 -c "ping 192.168.30.10 source 192.168.10.10"
 
 # [成功] Host2(TENANT_A) -> Host1(TENANT_A): 逆方向
-docker exec -it clab-lab06-l3evpn-ceos6 Cli -p 15 -c "ping 192.168.10.10 source 192.168.20.10"
+docker exec -it clab-lab06-l3evpn-host2 Cli -p 15 -c "ping 192.168.10.10 source 192.168.20.10"
 ```
 
 ---
@@ -315,47 +315,47 @@ show bgp evpn route-type ip-prefix
 
 ```bash
 # アンダーレイ疎通確認 (P2P リンク)
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show interface Ethernet1"
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "ping 10.1.0.1"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show interface Ethernet1"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "ping 10.1.0.1"
 
 # Loopback 経路の確認
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show ip route 1.1.1.1"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show ip route 1.1.1.1"
 ```
 
 ### Type-5 ルートが学習されない
 
 ```bash
 # VRF の redistribute connected が設定されているか確認
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show running-config | section router bgp"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show running-config | section router bgp"
 
 # VRF の route-target が一致しているか確認
 # Leaf1 (RT export 100:100) <-> Leaf2 (RT import 100:100) が一致していること
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show bgp evpn route-type ip-prefix"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show bgp evpn route-type ip-prefix"
 ```
 
 ### ping が通らない (L3 EVPN)
 
 ```bash
 # Leaf1 で TENANT_A の宛先サブネットのルートがあるか
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show ip route vrf TENANT_A 192.168.20.0/24"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_A 192.168.20.0/24"
 
 # Anycast GW の MAC が設定されているか
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show ip virtual-router"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show ip virtual-router"
 
 # Vlan SVI が up しているか
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show interface Vlan10"
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show interface Vlan100"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show interface Vlan10"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show interface Vlan100"
 ```
 
 ### VRF 分離の確認
 
 ```bash
 # Leaf1 の TENANT_A と TENANT_B が分離していること
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show ip route vrf TENANT_A"
-docker exec -it clab-lab06-l3evpn-ceos3 Cli -p 15 -c "show ip route vrf TENANT_B"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_A"
+docker exec -it clab-lab06-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_B"
 
 # Host1 (TENANT_A) から Host3 (TENANT_B) は到達不可であること
-docker exec -it clab-lab06-l3evpn-ceos5 Cli -p 15 -c "ping 192.168.30.10 source 192.168.10.10"
+docker exec -it clab-lab06-l3evpn-host1 Cli -p 15 -c "ping 192.168.30.10 source 192.168.10.10"
 ```
 
 ---

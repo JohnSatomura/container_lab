@@ -1,4 +1,4 @@
-# ceos1: Spine1 (AS65000, Loopback: 1.1.1.1)
+# spine1: Spine1 (AS65000, Loopback: 1.1.1.1)
 bgp_router_id: "1.1.1.1"
 loopback_network: "1.1.1.1/32"
 

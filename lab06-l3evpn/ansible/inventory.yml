@@ -2,21 +2,21 @@ all:
   children:
     spine:
       hosts:
-        ceos1:
-          ansible_host: clab-lab06-l3evpn-ceos1
-        ceos2:
-          ansible_host: clab-lab06-l3evpn-ceos2
+        spine1:
+          ansible_host: clab-lab06-l3evpn-spine1
+        spine2:
+          ansible_host: clab-lab06-l3evpn-spine2
     leaf:
       hosts:
-        ceos3:
-          ansible_host: clab-lab06-l3evpn-ceos3
-        ceos4:
-          ansible_host: clab-lab06-l3evpn-ceos4
+        leaf1:
+          ansible_host: clab-lab06-l3evpn-leaf1
+        leaf2:
+          ansible_host: clab-lab06-l3evpn-leaf2
     host:
       hosts:
-        ceos5:
-          ansible_host: clab-lab06-l3evpn-ceos5
-        ceos6:
-          ansible_host: clab-lab06-l3evpn-ceos6
-        ceos7:
-          ansible_host: clab-lab06-l3evpn-ceos7
+        host1:
+          ansible_host: clab-lab06-l3evpn-host1
+        host2:
+          ansible_host: clab-lab06-l3evpn-host2
+        host3:
+          ansible_host: clab-lab06-l3evpn-host3

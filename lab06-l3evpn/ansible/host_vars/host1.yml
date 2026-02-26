@@ -1,4 +1,4 @@
-# ceos5: Host1 (TENANT_A, 192.168.10.10)
+# host1: Host1 (TENANT_A, 192.168.10.10)
 host_vlan: 10
 host_ip: "192.168.10.10/24"
 host_gw: "192.168.10.254"

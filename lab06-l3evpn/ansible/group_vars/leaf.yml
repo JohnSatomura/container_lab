@@ -1,4 +1,4 @@
-# Leaf ノード (ceos3, ceos4) 共通変数
+# Leaf ノード (leaf1, leaf2) 共通変数
 
 # 全 Leaf で共通の Anycast Gateway MAC アドレス
 anycast_gw_mac: "00:1c:73:00:00:01"
