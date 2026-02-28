@@ -1,0 +1,36 @@
+name: lab-ospf
+
+topology:
+  nodes:
+    ceos1:
+      kind: ceos
+      image: ceos:4.34.4M
+      startup-config: configs-init/ceos1.cfg
+    ceos2:
+      kind: ceos
+      image: ceos:4.34.4M
+      startup-config: configs-init/ceos2.cfg
+    ceos3:
+      kind: ceos
+      image: ceos:4.34.4M
+      startup-config: configs-init/ceos3.cfg
+    ceos4:
+      kind: ceos
+      image: ceos:4.34.4M
+      startup-config: configs-init/ceos4.cfg
+    ceos5:
+      kind: ceos
+      image: ceos:4.34.4M
+      startup-config: configs-init/ceos5.cfg
+    br-area0:
+      kind: bridge
+
+  links:
+    # Area 0 - ブロードキャストセグメント（DR/BDR 選出）
+    - endpoints: ["ceos1:eth1", "br-area0:eth1"]
+    - endpoints: ["ceos2:eth1", "br-area0:eth2"]
+    - endpoints: ["ceos3:eth1", "br-area0:eth3"]
+    # Area 1 - P2P リンク
+    - endpoints: ["ceos1:eth2", "ceos4:eth1"]
+    # Area 2 - P2P リンク
+    - endpoints: ["ceos2:eth2", "ceos5:eth1"]
