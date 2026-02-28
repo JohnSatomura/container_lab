@@ -1,4 +1,4 @@
-name: lab-evpn
+name: evpn
 
 topology:
   nodes:

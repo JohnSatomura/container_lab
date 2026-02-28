@@ -7,4 +7,4 @@ if [ -f topology-full.yml ]; then
 else
   containerlab destroy -t topology.yml
 fi
-rm -rf clab-lab-basic/ topology-full.yml
+rm -rf clab-basic/ topology-full.yml

@@ -11,7 +11,7 @@ else
 fi
 
 # 自動生成ディレクトリと topology-full.yml を削除（次回 deploy 時に確実に反映されるように）
-rm -rf clab-lab-ospf/ topology-full.yml
+rm -rf clab-ospf/ topology-full.yml
 
 # Linux bridge の削除
 if ip link show br-area0 > /dev/null 2>&1; then

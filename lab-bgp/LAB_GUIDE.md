@@ -164,7 +164,7 @@ ceos2 経由は `65001`（長さ1）のままなので、ceos6 から見て ISP-
 
 ```bash
 # 例: ceos1 に接続
-docker exec -it clab-lab-bgp-ceos1 Cli
+docker exec -it clab-bgp-ceos1 Cli
 ```
 
 接続後:
@@ -295,8 +295,8 @@ router bgp 65004
 ### 1. BGP セッション確認
 
 ```bash
-docker exec clab-lab-bgp-ceos2 /usr/bin/Cli -c "show bgp summary"
-docker exec clab-lab-bgp-ceos4 /usr/bin/Cli -c "show bgp summary"
+docker exec clab-bgp-ceos2 /usr/bin/Cli -c "show bgp summary"
+docker exec clab-bgp-ceos4 /usr/bin/Cli -c "show bgp summary"
 ```
 
 全ピアの State が `Estab` になっていることを確認。
@@ -304,7 +304,7 @@ docker exec clab-lab-bgp-ceos4 /usr/bin/Cli -c "show bgp summary"
 ### 2. AS-PATH prepend の効果確認（ceos6 から見た 1.1.1.1/32）
 
 ```bash
-docker exec clab-lab-bgp-ceos6 /usr/bin/Cli -c "show ip bgp 1.1.1.1"
+docker exec clab-bgp-ceos6 /usr/bin/Cli -c "show ip bgp 1.1.1.1"
 ```
 
 期待される出力（2経路のうち AS-PATH が短い方に `>` が付く）：
@@ -321,14 +321,14 @@ BGP routing table entry for 1.1.1.1/32
 ### 3. エンドツーエンド ping（ceos1 Lo → ceos6 Lo）
 
 ```bash
-docker exec clab-lab-bgp-ceos1 /usr/bin/Cli -p 15 -c "ping 6.6.6.6 source 1.1.1.1"
-docker exec clab-lab-bgp-ceos6 /usr/bin/Cli -p 15 -c "ping 1.1.1.1 source 6.6.6.6"
+docker exec clab-bgp-ceos1 /usr/bin/Cli -p 15 -c "ping 6.6.6.6 source 1.1.1.1"
+docker exec clab-bgp-ceos6 /usr/bin/Cli -p 15 -c "ping 1.1.1.1 source 6.6.6.6"
 ```
 
 ### 4. EOS CLI に入って対話的に確認する場合
 
 ```bash
-docker exec -it clab-lab-bgp-ceos6 Cli
+docker exec -it clab-bgp-ceos6 Cli
 ```
 
 ```

@@ -151,34 +151,34 @@ BGP / EVPN / VRF / VLAN / VXLAN は手動で設定する。
 
 ```bash
 # Spine1 で Leaf の Loopback が学習されていること
-docker exec -it clab-lab-l3evpn-spine1 Cli -p 15 -c "show bgp summary"
-docker exec -it clab-lab-l3evpn-spine1 Cli -p 15 -c "show ip route"
+docker exec -it clab-l3evpn-spine1 Cli -p 15 -c "show bgp summary"
+docker exec -it clab-l3evpn-spine1 Cli -p 15 -c "show ip route"
 
 # Leaf1 で Spine 経由の Loopback 到達性確認
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "ping 4.4.4.4 source 3.3.3.3"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "ping 4.4.4.4 source 3.3.3.3"
 ```
 
 ### Step 2: オーバーレイ確認 (BGP EVPN セッション)
 
 ```bash
 # Leaf1 の EVPN ピア確認
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show bgp evpn summary"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show bgp evpn summary"
 
 # Leaf2 の EVPN ピア確認
-docker exec -it clab-lab-l3evpn-leaf2 Cli -p 15 -c "show bgp evpn summary"
+docker exec -it clab-l3evpn-leaf2 Cli -p 15 -c "show bgp evpn summary"
 ```
 
 ### Step 3: VRF / VXLAN 確認
 
 ```bash
 # Leaf1 の VRF 状態
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show vrf"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show vrf"
 
 # Leaf1 の VNI マッピング (L2VNI + L3VNI が表示されること)
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show vxlan vni"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show vxlan vni"
 
 # Leaf2 の VNI マッピング
-docker exec -it clab-lab-l3evpn-leaf2 Cli -p 15 -c "show vxlan vni"
+docker exec -it clab-l3evpn-leaf2 Cli -p 15 -c "show vxlan vni"
 ```
 
 ### Step 4: Type-5 ルート確認
@@ -186,11 +186,11 @@ docker exec -it clab-lab-l3evpn-leaf2 Cli -p 15 -c "show vxlan vni"
 ```bash
 # Leaf1 で TENANT_A の IP Prefix (Type-5) ルートを確認
 # 192.168.20.0/24 (Leaf2 側) が学習されていること
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show bgp evpn route-type ip-prefix"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show bgp evpn route-type ip-prefix"
 
 # Leaf2 で TENANT_A の IP Prefix ルートを確認
 # 192.168.10.0/24 (Leaf1 側) が学習されていること
-docker exec -it clab-lab-l3evpn-leaf2 Cli -p 15 -c "show bgp evpn route-type ip-prefix"
+docker exec -it clab-l3evpn-leaf2 Cli -p 15 -c "show bgp evpn route-type ip-prefix"
 ```
 
 ### Step 5: VRF ルーティングテーブル確認
@@ -198,27 +198,27 @@ docker exec -it clab-lab-l3evpn-leaf2 Cli -p 15 -c "show bgp evpn route-type ip-
 ```bash
 # Leaf1 TENANT_A ルーティングテーブル
 # 192.168.20.0/24 が EVPN 経由 (VTEP: 4.4.4.4) で存在すること
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_A"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_A"
 
 # Leaf1 TENANT_B ルーティングテーブル
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_B"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_B"
 
 # Leaf2 TENANT_A ルーティングテーブル
 # 192.168.10.0/24 が EVPN 経由 (VTEP: 3.3.3.3) で存在すること
-docker exec -it clab-lab-l3evpn-leaf2 Cli -p 15 -c "show ip route vrf TENANT_A"
+docker exec -it clab-l3evpn-leaf2 Cli -p 15 -c "show ip route vrf TENANT_A"
 ```
 
 ### Step 6: エンドツーエンド疎通確認
 
 ```bash
 # [成功] Host1(TENANT_A) -> Host2(TENANT_A): 異なるサブネット間 L3 EVPN ルーティング
-docker exec -it clab-lab-l3evpn-host1 Cli -p 15 -c "ping 192.168.20.10 source 192.168.10.10"
+docker exec -it clab-l3evpn-host1 Cli -p 15 -c "ping 192.168.20.10 source 192.168.10.10"
 
 # [失敗] Host1(TENANT_A) -> Host3(TENANT_B): VRF 分離 - 到達不可であること
-docker exec -it clab-lab-l3evpn-host1 Cli -p 15 -c "ping 192.168.30.10 source 192.168.10.10"
+docker exec -it clab-l3evpn-host1 Cli -p 15 -c "ping 192.168.30.10 source 192.168.10.10"
 
 # [成功] Host2(TENANT_A) -> Host1(TENANT_A): 逆方向
-docker exec -it clab-lab-l3evpn-host2 Cli -p 15 -c "ping 192.168.10.10 source 192.168.20.10"
+docker exec -it clab-l3evpn-host2 Cli -p 15 -c "ping 192.168.10.10 source 192.168.20.10"
 ```
 
 ---
@@ -315,47 +315,47 @@ show bgp evpn route-type ip-prefix
 
 ```bash
 # アンダーレイ疎通確認 (P2P リンク)
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show interface Ethernet1"
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "ping 10.1.0.1"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show interface Ethernet1"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "ping 10.1.0.1"
 
 # Loopback 経路の確認
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show ip route 1.1.1.1"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show ip route 1.1.1.1"
 ```
 
 ### Type-5 ルートが学習されない
 
 ```bash
 # VRF の redistribute connected が設定されているか確認
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show running-config | section router bgp"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show running-config | section router bgp"
 
 # VRF の route-target が一致しているか確認
 # Leaf1 (RT export 100:100) <-> Leaf2 (RT import 100:100) が一致していること
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show bgp evpn route-type ip-prefix"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show bgp evpn route-type ip-prefix"
 ```
 
 ### ping が通らない (L3 EVPN)
 
 ```bash
 # Leaf1 で TENANT_A の宛先サブネットのルートがあるか
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_A 192.168.20.0/24"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_A 192.168.20.0/24"
 
 # Anycast GW の MAC が設定されているか
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show ip virtual-router"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show ip virtual-router"
 
 # Vlan SVI が up しているか
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show interface Vlan10"
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show interface Vlan100"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show interface Vlan10"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show interface Vlan100"
 ```
 
 ### VRF 分離の確認
 
 ```bash
 # Leaf1 の TENANT_A と TENANT_B が分離していること
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_A"
-docker exec -it clab-lab-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_B"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_A"
+docker exec -it clab-l3evpn-leaf1 Cli -p 15 -c "show ip route vrf TENANT_B"
 
 # Host1 (TENANT_A) から Host3 (TENANT_B) は到達不可であること
-docker exec -it clab-lab-l3evpn-host1 Cli -p 15 -c "ping 192.168.30.10 source 192.168.10.10"
+docker exec -it clab-l3evpn-host1 Cli -p 15 -c "ping 192.168.30.10 source 192.168.10.10"
 ```
 
 ---
@@ -370,4 +370,4 @@ docker exec -it clab-lab-l3evpn-host1 Cli -p 15 -c "ping 192.168.30.10 source 19
 - containerlab ノード全台
 - `ansible-lab-l3evpn` コンテナ
 - `ansible-eos` Docker イメージ
-- `clab-lab-l3evpn/` ディレクトリ
+- `clab-l3evpn/` ディレクトリ

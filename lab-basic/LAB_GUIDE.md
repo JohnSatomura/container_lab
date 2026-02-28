@@ -72,7 +72,7 @@ lab-basic/
 ## 設定内容
 
 containerlab が deploy 時に自動生成する初期設定（startup-config）の内容を記載する。
-各ノードの `clab-lab-basic/<ノード名>/flash/startup-config` に保存されている。
+各ノードの `clab-basic/<ノード名>/flash/startup-config` に保存されている。
 
 ### 共通設定（ceos1 / ceos2 共通）
 
@@ -166,8 +166,8 @@ docker ps --filter "label=containerlab=lab-basic"
 ### EOS CLI に入る（対話モード）
 
 ```bash
-docker exec -it clab-lab-basic-ceos1 Cli
-docker exec -it clab-lab-basic-ceos2 Cli
+docker exec -it clab-basic-ceos1 Cli
+docker exec -it clab-basic-ceos2 Cli
 ```
 
 CLI に入ったら以下のコマンドで確認する：
@@ -197,6 +197,6 @@ containerlab exec -t topology.yml --cmd "/usr/bin/Cli -c 'show version'"
 containerlab exec -t topology.yml --cmd "/usr/bin/Cli -c 'show interfaces status'"
 
 # 特定ノードのみ
-docker exec clab-lab-basic-ceos1 /usr/bin/Cli -c "show version"
-docker exec clab-lab-basic-ceos2 /usr/bin/Cli -c "show interfaces status"
+docker exec clab-basic-ceos1 /usr/bin/Cli -c "show version"
+docker exec clab-basic-ceos2 /usr/bin/Cli -c "show interfaces status"
 ```

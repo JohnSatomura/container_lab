@@ -41,12 +41,12 @@ docker exec <コンテナ名> /usr/bin/Cli -p 15 -c "ping 5.5.5.5 source 4.4.4.4
 
 | ラボ | コンテナ名の例 |
 |------|--------------|
-| lab-basic | `clab-lab-basic-ceos1` |
-| lab-ospf | `clab-lab-ospf-ceos1` |
-| lab-bgp | `clab-lab-bgp-ceos1` |
-| lab-ansible | `clab-lab-ansible-ceos1` |
-| lab-evpn | `clab-lab-evpn-spine1` / `clab-lab-evpn-leaf1` / `clab-lab-evpn-host1` |
-| lab-l3evpn | `clab-lab-l3evpn-spine1` / `clab-lab-l3evpn-leaf1` / `clab-lab-l3evpn-host1` |
+| lab-basic | `clab-basic-ceos1` |
+| lab-ospf | `clab-ospf-ceos1` |
+| lab-bgp | `clab-bgp-ceos1` |
+| lab-ansible | `clab-ansible-ceos1` |
+| lab-evpn | `clab-evpn-spine1` / `clab-evpn-leaf1` / `clab-evpn-host1` |
+| lab-l3evpn | `clab-l3evpn-spine1` / `clab-l3evpn-leaf1` / `clab-l3evpn-host1` |
 
 ---
 

@@ -32,13 +32,13 @@ docker run -d \
 if [ "$AUTO_APPLY" = true ]; then
   echo "[INFO] 全ノードの eAPI 起動を待機します..."
   NODES=(
-    clab-lab-l3evpn-spine1
-    clab-lab-l3evpn-spine2
-    clab-lab-l3evpn-leaf1
-    clab-lab-l3evpn-leaf2
-    clab-lab-l3evpn-host1
-    clab-lab-l3evpn-host2
-    clab-lab-l3evpn-host3
+    clab-l3evpn-spine1
+    clab-l3evpn-spine2
+    clab-l3evpn-leaf1
+    clab-l3evpn-leaf2
+    clab-l3evpn-host1
+    clab-l3evpn-host2
+    clab-l3evpn-host3
   )
   for node in "${NODES[@]}"; do
     echo -n "  $node ..."

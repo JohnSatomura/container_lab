@@ -150,7 +150,7 @@ OSPF 設定はまだない。
 まず1台（ceos1）だけ手動で設定して、「8台分やる気になれない…」を体感する。
 
 ```bash
-docker exec -it clab-lab-ansible-ceos1 Cli
+docker exec -it clab-ansible-ceos1 Cli
 ```
 
 ```
@@ -207,7 +207,7 @@ Host1（ceos7、7.7.7.7）から Host2（ceos8、8.8.8.8）への ping が通れ
 spine:
   hosts:
     ceos1:
-      ansible_host: clab-lab-ansible-ceos1   # /etc/hosts に自動登録される
+      ansible_host: clab-ansible-ceos1   # /etc/hosts に自動登録される
 ```
 
 ### group_vars/all.yml
@@ -262,10 +262,10 @@ ospf_networks:
 
 ```bash
 # Spine1（ceos1）の OSPF 隣接：4台（Leaf1〜Leaf4）が Full になっていること
-docker exec clab-lab-ansible-ceos1 /usr/bin/Cli -c "show ip ospf neighbor"
+docker exec clab-ansible-ceos1 /usr/bin/Cli -c "show ip ospf neighbor"
 
 # Host1（ceos7）の OSPF 隣接：Leaf1（ceos3）のみ Full になっていること
-docker exec clab-lab-ansible-ceos7 /usr/bin/Cli -c "show ip ospf neighbor"
+docker exec clab-ansible-ceos7 /usr/bin/Cli -c "show ip ospf neighbor"
 ```
 
 期待される出力（ceos1）：
@@ -281,7 +281,7 @@ Neighbor ID     Pri   State     Dead Time   Address         Interface
 
 ```bash
 # Host1 のルーティングテーブル：8.8.8.8/32 が OSPF 経由で学習されていること
-docker exec clab-lab-ansible-ceos7 /usr/bin/Cli -c "show ip route ospf"
+docker exec clab-ansible-ceos7 /usr/bin/Cli -c "show ip route ospf"
 ```
 
 期待される出力（抜粋）：
@@ -293,7 +293,7 @@ O     8.8.8.8/32 [110/40] via 10.3.0.1, Ethernet1
 
 ```bash
 # Host1 から Host2 の Loopback0 へ ping
-docker exec clab-lab-ansible-ceos7 /usr/bin/Cli -p 15 -c "ping 8.8.8.8 source 7.7.7.7"
+docker exec clab-ansible-ceos7 /usr/bin/Cli -p 15 -c "ping 8.8.8.8 source 7.7.7.7"
 ```
 
 期待される出力：
@@ -306,7 +306,7 @@ PING 8.8.8.8 (8.8.8.8) from 7.7.7.7 : 72(100) bytes of data.
 ### EOS CLI に入って対話的に確認する
 
 ```bash
-docker exec -it clab-lab-ansible-ceos1 Cli
+docker exec -it clab-ansible-ceos1 Cli
 ```
 
 ```
@@ -337,7 +337,7 @@ ansible-playbook -i inventory.yml playbooks/site.yml  # 2回目は "changed=0" �
 | 症状 | 確認コマンド | 原因候補 |
 |------|------------|---------|
 | Ansible が接続できない | `ansible all -i inventory.yml -m ping` | コンテナ未起動・eAPI 未有効化 |
-| `Connection refused` エラー | `docker exec clab-lab-ansible-ceos1 /usr/bin/Cli -c "show management api http-commands"` | management api http-commands が無効 |
+| `Connection refused` エラー | `docker exec clab-ansible-ceos1 /usr/bin/Cli -c "show management api http-commands"` | management api http-commands が無効 |
 | OSPF 隣接が形成されない | `show ip ospf neighbor` | OSPF 設定未投入・インターフェース DOWN |
 | ping が通らない | `show ip route 8.8.8.8` | OSPF 経路が RIB に入っていない |
 | `module not found: arista.eos` | `ansible-galaxy collection list` | コレクション未インストール |

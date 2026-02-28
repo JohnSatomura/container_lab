@@ -1,4 +1,4 @@
-name: lab-bgp
+name: bgp
 
 topology:
   nodes:

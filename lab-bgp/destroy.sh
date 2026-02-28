@@ -11,4 +11,4 @@ else
 fi
 
 # 自動生成ディレクトリと topology-full.yml を削除（次回 deploy 時に確実に反映されるように）
-rm -rf clab-lab-bgp/ topology-full.yml
+rm -rf clab-bgp/ topology-full.yml

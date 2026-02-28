@@ -1,4 +1,4 @@
-name: lab-l3evpn
+name: l3evpn
 
 topology:
   nodes:

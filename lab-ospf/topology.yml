@@ -1,4 +1,4 @@
-name: lab-ospf
+name: ospf
 
 topology:
   nodes:

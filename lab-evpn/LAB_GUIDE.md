@@ -259,60 +259,60 @@ router bgp 65001
 
 ```bash
 # Leaf1 の BGP セッション(Spine1・Spine2 と Estab になること)
-docker exec clab-lab-evpn-leaf1 /usr/bin/Cli -c "show bgp summary"
+docker exec clab-evpn-leaf1 /usr/bin/Cli -c "show bgp summary"
 
 # Spine1 の BGP セッション(全 Leaf と Estab になること)
-docker exec clab-lab-evpn-spine1 /usr/bin/Cli -c "show bgp summary"
+docker exec clab-evpn-spine1 /usr/bin/Cli -c "show bgp summary"
 ```
 
 ### Step 2: アンダーレイ経路確認(Loopback 到達性)
 
 ```bash
 # Leaf1 が全 Leaf の Loopback を学習していること
-docker exec clab-lab-evpn-leaf1 /usr/bin/Cli -c "show ip route bgp"
+docker exec clab-evpn-leaf1 /usr/bin/Cli -c "show ip route bgp"
 
 # Leaf1 → Leaf4(VTEP IP = 6.6.6.6)への疎通確認
-docker exec clab-lab-evpn-leaf1 /usr/bin/Cli -p 15 -c "ping 6.6.6.6 source 3.3.3.3"
+docker exec clab-evpn-leaf1 /usr/bin/Cli -p 15 -c "ping 6.6.6.6 source 3.3.3.3"
 ```
 
 ### Step 3: EVPN セッション確認
 
 ```bash
 # Spine1 の EVPN セッション(全 Leaf と Estab になること)
-docker exec clab-lab-evpn-spine1 /usr/bin/Cli -c "show bgp evpn summary"
+docker exec clab-evpn-spine1 /usr/bin/Cli -c "show bgp evpn summary"
 
 # Leaf1 の EVPN セッション(Spine1・Spine2 と Estab になること)
-docker exec clab-lab-evpn-leaf1 /usr/bin/Cli -c "show bgp evpn summary"
+docker exec clab-evpn-leaf1 /usr/bin/Cli -c "show bgp evpn summary"
 ```
 
 ### Step 4: VTEP 自動発見確認(Type-3 ルート)
 
 ```bash
 # Leaf1 が学習した VTEP 一覧(Leaf1〜Leaf4 の Loopback が並ぶこと)
-docker exec clab-lab-evpn-leaf1 /usr/bin/Cli -c "show vxlan vtep"
-docker exec clab-lab-evpn-leaf1 /usr/bin/Cli -c "show vxlan vni"
+docker exec clab-evpn-leaf1 /usr/bin/Cli -c "show vxlan vtep"
+docker exec clab-evpn-leaf1 /usr/bin/Cli -c "show vxlan vni"
 
 # Spine1 が保持する全 EVPN ルート
-docker exec clab-lab-evpn-spine1 /usr/bin/Cli -c "show bgp evpn"
+docker exec clab-evpn-spine1 /usr/bin/Cli -c "show bgp evpn"
 ```
 
 ### Step 5: エンドツーエンド ping(L2 VXLAN ストレッチ確認)
 
 ```bash
 # Host1 → Host2(異なる Leaf 間の L2 延伸を確認)
-docker exec clab-lab-evpn-host1 /usr/bin/Cli -p 15 -c "ping 192.168.10.2 source 192.168.10.1 repeat 5"
+docker exec clab-evpn-host1 /usr/bin/Cli -p 15 -c "ping 192.168.10.2 source 192.168.10.1 repeat 5"
 ```
 
 ### Step 6: MAC 学習確認(Type-2 ルート)
 
 ```bash
 # ping 後に MAC テーブルを確認
-docker exec clab-lab-evpn-leaf1 /usr/bin/Cli -c "show mac address-table"
-docker exec clab-lab-evpn-leaf4 /usr/bin/Cli -c "show mac address-table"
+docker exec clab-evpn-leaf1 /usr/bin/Cli -c "show mac address-table"
+docker exec clab-evpn-leaf4 /usr/bin/Cli -c "show mac address-table"
 
 # EVPN MAC-IP ルートの確認
-docker exec clab-lab-evpn-leaf1 /usr/bin/Cli -c "show bgp evpn route-type mac-ip"
-docker exec clab-lab-evpn-spine1 /usr/bin/Cli -c "show bgp evpn route-type mac-ip"
+docker exec clab-evpn-leaf1 /usr/bin/Cli -c "show bgp evpn route-type mac-ip"
+docker exec clab-evpn-spine1 /usr/bin/Cli -c "show bgp evpn route-type mac-ip"
 ```
 
 ---
@@ -367,7 +367,7 @@ EVPN セッションは Loopback 間(2ホップ先)で peer する。multihop �
 ## EOS CLI で対話的に確認
 
 ```bash
-docker exec -it clab-lab-evpn-leaf1 Cli
+docker exec -it clab-evpn-leaf1 Cli
 ```
 
 ```

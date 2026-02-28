@@ -170,7 +170,7 @@ containerlab inspect -t topology.yml
 
 ```bash
 # 例: ceos1 に接続
-docker exec -it clab-lab-ospf-ceos1 Cli
+docker exec -it clab-ospf-ceos1 Cli
 ```
 
 接続後:
@@ -241,7 +241,7 @@ router ospf 1
 ### 1. DR/BDR 選出の確認
 
 ```bash
-docker exec clab-lab-ospf-ceos1 /usr/bin/Cli -c "show ip ospf neighbor"
+docker exec clab-ospf-ceos1 /usr/bin/Cli -c "show ip ospf neighbor"
 ```
 
 期待される出力（ceos3 が DR、ceos2 が BDR）：
@@ -255,13 +255,13 @@ Neighbor ID  State      Interface    Role
 ceos3 から見ると自分が DR になっているはず：
 
 ```bash
-docker exec clab-lab-ospf-ceos3 /usr/bin/Cli -c "show ip ospf neighbor"
+docker exec clab-ospf-ceos3 /usr/bin/Cli -c "show ip ospf neighbor"
 ```
 
 ### 2. マルチエリア・ABR の確認
 
 ```bash
-docker exec clab-lab-ospf-ceos1 /usr/bin/Cli -c "show ip ospf"
+docker exec clab-ospf-ceos1 /usr/bin/Cli -c "show ip ospf"
 ```
 
 `This router is an ABR` と表示されることを確認する。
@@ -271,23 +271,23 @@ docker exec clab-lab-ospf-ceos1 /usr/bin/Cli -c "show ip ospf"
 ceos4（Area1）から Area2 のルートが Type3 として学習されていること：
 
 ```bash
-docker exec clab-lab-ospf-ceos4 /usr/bin/Cli -c "show ip ospf database summary"
+docker exec clab-ospf-ceos4 /usr/bin/Cli -c "show ip ospf database summary"
 ```
 
 ceos5（Area2）から Area1 のルートが Type3 として学習されていること：
 
 ```bash
-docker exec clab-lab-ospf-ceos5 /usr/bin/Cli -c "show ip ospf database summary"
+docker exec clab-ospf-ceos5 /usr/bin/Cli -c "show ip ospf database summary"
 ```
 
 ### 4. ルーティングテーブルの確認
 
 ```bash
 # ceos4 から Area2 の 5.5.5.5/32 が O IA（inter-area）で見えること
-docker exec clab-lab-ospf-ceos4 /usr/bin/Cli -c "show ip route ospf"
+docker exec clab-ospf-ceos4 /usr/bin/Cli -c "show ip route ospf"
 
 # ceos5 から Area1 の 4.4.4.4/32 が O IA（inter-area）で見えること
-docker exec clab-lab-ospf-ceos5 /usr/bin/Cli -c "show ip route ospf"
+docker exec clab-ospf-ceos5 /usr/bin/Cli -c "show ip route ospf"
 ```
 
 期待される出力（ceos4）：
@@ -303,17 +303,17 @@ O IA     10.2.0.0/30 [110/...] via 10.1.0.1, Ethernet1
 
 ```bash
 # ceos4（Area1）→ ceos5（Area2）の Loopback
-docker exec clab-lab-ospf-ceos4 /usr/bin/Cli -c "ping 5.5.5.5 source 4.4.4.4"
+docker exec clab-ospf-ceos4 /usr/bin/Cli -c "ping 5.5.5.5 source 4.4.4.4"
 
 # 逆方向：ceos5（Area2）→ ceos4（Area1）の Loopback
-docker exec clab-lab-ospf-ceos5 /usr/bin/Cli -c "ping 4.4.4.4 source 5.5.5.5"
+docker exec clab-ospf-ceos5 /usr/bin/Cli -c "ping 4.4.4.4 source 5.5.5.5"
 ```
 
 ### 6. LSA データベースの確認（全体像）
 
 ```bash
 # Area0 の DR が生成する Type2（Network LSA）を確認
-docker exec clab-lab-ospf-ceos1 /usr/bin/Cli -c "show ip ospf database"
+docker exec clab-ospf-ceos1 /usr/bin/Cli -c "show ip ospf database"
 ```
 
 | LSA タイプ | 生成者 | 内容 |
@@ -325,7 +325,7 @@ docker exec clab-lab-ospf-ceos1 /usr/bin/Cli -c "show ip ospf database"
 ### EOS CLI に入って対話的に確認する場合
 
 ```bash
-docker exec -it clab-lab-ospf-ceos1 Cli
+docker exec -it clab-ospf-ceos1 Cli
 ```
 
 ```

@@ -1,4 +1,4 @@
-name: lab-ansible
+name: ansible
 
 topology:
   nodes:

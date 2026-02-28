@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 containerlab destroy -t topology.yml
 
 # 自動生成ディレクトリを削除
-rm -rf clab-lab-l3evpn/
+rm -rf clab-l3evpn/
 
 # ansible-lab-l3evpn コンテナを削除
 if docker ps -a --format '{{.Names}}' | grep -q '^ansible-lab-l3evpn$'; then
