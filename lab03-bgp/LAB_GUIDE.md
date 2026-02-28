@@ -145,36 +145,16 @@ cd ~/git/container_lab/lab03-bgp
 
 ### スタブ AS の export filter（ceos1・ceos6 で実施）
 
-スタブ AS は他の AS の transit（中継）をしてはならない。自 prefix のみを広告するフィルタを設定する。
-
-```
-! ceos1 の例（ceos6 も同様）
-ip prefix-list OWN-PREFIX seq 10 permit 1.1.1.1/32
-!
-route-map EXPORT-TO-ISPA permit 10
-   match ip address prefix-list OWN-PREFIX
-!
-route-map EXPORT-TO-ISPB permit 10
-   match ip address prefix-list OWN-PREFIX
-   set as-path prepend 65001 65001
-!
-router bgp 65001
-   neighbor 10.0.12.2 route-map EXPORT-TO-ISPA out
-   neighbor 10.0.13.2 route-map EXPORT-TO-ISPB out
-```
+スタブ AS は他の AS の transit（中継）をしてはならない。`ip prefix-list` と `route-map` を組み合わせ、自 prefix のみを広告するフィルタを設定する。
 
 ### AS-PATH prepend の設定（ceos1 で実施）
 
-ceos3 側（ISP-B）への広告経路を backup にするため、ceos1 の `EXPORT-TO-ISPB` route-map に prepend を設定する。
-
-```
-route-map EXPORT-TO-ISPB permit 10
-   match ip address prefix-list OWN-PREFIX
-   set as-path prepend 65001 65001
-```
+ceos3 側（ISP-B）への広告経路を backup にするため、ceos1 の ISP-B 向け `route-map` に `set as-path prepend 65001 65001` を追加する。
 
 これにより ceos3 が受け取る 1.1.1.1/32 の AS-PATH は `65001 65001 65001`（長さ3）になる。
 ceos2 経由は `65001`（長さ1）のままなので、ceos6 から見て ISP-A 経由が優先される。
+
+具体的な設定コマンドは「ハンズオン設定手順」セクションを参照。
 
 ---
 

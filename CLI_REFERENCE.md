@@ -145,7 +145,7 @@ show ip route bgp                # BGP で学習した経路のみ（B E / B I �
 
 ---
 
-## OSPF + BGP 再配布コマンド（lab06）
+## OSPF + BGP 再配布コマンド（参考）
 
 ```
 show ip route                    # OSPF・BGP 両方の経路が混在することを確認
