@@ -152,3 +152,66 @@ show ip route                    # OSPF・BGP 両方の経路が混在するこ�
 show ip ospf database external   # redistribute bgp で生成された Type5 LSA を確認
 show ip bgp                      # redistribute ospf で BGP に入った経路を確認
 ```
+
+---
+
+## VXLAN 確認コマンド（lab05-evpn / lab06-l3evpn 共通）
+
+```
+show vxlan vtep                  # 発見済み VTEP 一覧（Type-3 ルートで自動学習した VTEP IP）
+show vxlan vni                   # VNI <-> VLAN マッピング一覧（L2VNI・L3VNI の両方を表示）
+show vxlan address-table         # VXLAN 経由で学習した MAC テーブル（リモートホストのエントリ）
+show vxlan flood vtep            # BUM トラフィックのフラッディング先 VTEP 一覧
+```
+
+### MAC テーブルの見方
+
+`show mac address-table` のポートフィールド:
+
+| 表示 | 意味 |
+|------|------|
+| `Port: EtX` | ローカルポートから直接学習 |
+| `Port: Vx1` | VXLAN (Vxlan1) 経由で学習（リモート VTEP からの Type-2 伝播） |
+
+---
+
+## BGP EVPN 確認コマンド（lab05-evpn / lab06-l3evpn 共通）
+
+```
+show bgp evpn summary            # EVPN セッション一覧（ピア IP・State・受信ルート数）
+show bgp evpn                    # EVPN BGP テーブル全体（全ルートタイプ）
+show bgp evpn route-type mac-ip  # Type-2: MAC/IP ルート（ホストの MAC・IP 学習・伝播）
+show bgp evpn route-type imet    # Type-3: VTEP 発見ルート（IMET・どの VTEP が同一 VNI に参加しているか）
+show bgp evpn route-type ip-prefix  # Type-5: IP プレフィックスルート（L3 EVPN のサブネット広告）
+show mac address-table           # MAC テーブル（ローカル学習 + EVPN 経由のリモートエントリ）
+show mac address-table dynamic   # 動的学習エントリのみ表示
+```
+
+### EVPN ルートタイプ早見表
+
+| Type | 名前 | 運ぶ情報 | 主な用途 |
+|------|------|---------|---------|
+| Type-2 | MAC-IP Advertisement | MAC アドレス・IP アドレス | ホスト MAC/IP の学習と全 Leaf への伝播 |
+| Type-3 | Inclusive Multicast Ethernet Tag | VTEP IP・VNI | BGP セッション確立後の VTEP 自動発見 |
+| Type-5 | IP Prefix Route | IPv4/IPv6 プレフィックス | L3 EVPN によるサブネット間ルーティング |
+
+---
+
+## L3 EVPN / VRF 確認コマンド（lab06-l3evpn）
+
+```
+show vrf                              # VRF 一覧（名前・RD・動作プロトコル）
+show ip route vrf <VRF名>             # VRF のルーティングテーブル全体
+show ip route vrf <VRF名> <prefix>    # VRF 内の特定プレフィックス詳細（nexthop・VTEP IP 確認）
+show ip virtual-router                # Anycast Gateway の MAC アドレス・IP アドレス確認
+show running-config | section vxlan   # Vxlan インターフェース設定（VNI マッピング・VRF 割り当て）
+```
+
+### L2VNI と L3VNI の違い
+
+| 項目 | L2VNI | L3VNI |
+|------|-------|-------|
+| 割り当て単位 | VLAN ごと | VRF ごと |
+| 用途 | L2 ストレッチ（異なる Leaf 間の同一 L2 セグメント延伸） | VRF 内のサブネット間 L3 ルーティング |
+| 対応ルートタイプ | Type-2 (MAC-IP)・Type-3 (VTEP 発見) | Type-5 (IP Prefix) |
+| EOS 設定 | `vxlan vlan <id> vni <vni>` | `vxlan vrf <VRF名> vni <vni>` |
