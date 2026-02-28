@@ -44,6 +44,9 @@ docker exec <コンテナ名> /usr/bin/Cli -p 15 -c "ping 5.5.5.5 source 4.4.4.4
 | lab01-basic | `clab-lab01-basic-ceos1` |
 | lab02-ospf | `clab-lab02-ospf-ceos1` |
 | lab03-bgp | `clab-lab03-bgp-ceos1` |
+| lab04-ansible | `clab-lab04-ansible-ceos1` |
+| lab05-evpn | `clab-lab05-evpn-spine1` / `clab-lab05-evpn-leaf1` / `clab-lab05-evpn-host1` |
+| lab06-l3evpn | `clab-lab06-l3evpn-spine1` / `clab-lab06-l3evpn-leaf1` / `clab-lab06-l3evpn-host1` |
 
 ---
 
