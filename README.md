@@ -167,6 +167,30 @@ containerlab version
 
 ---
 
+### [lab-evpn](./lab-evpn/LAB_GUIDE.md) — BGP EVPN / VXLAN L2 ストレッチ
+
+**目的:** Leaf-Spine ファブリック上で BGP EVPN + VXLAN を構成し、異なる Leaf に接続されたホスト同士が L2 レベルで通信できることを確認する。アンダーレイ eBGP でルータブル基盤を作り、オーバーレイ BGP EVPN で VTEP を自動発見する仕組みを体感することがゴール。
+
+| 項目 | 内容 |
+|------|------|
+| 構成 | Leaf-Spine（Spine×2・Leaf×4・Host×2）|
+| 台数 | 8台 |
+| ハンズオンで設定すること | アンダーレイ eBGP（Loopback 広告）+ オーバーレイ EVPN（VTEP 設定・VLAN/VNI マッピング）|
+
+---
+
+### [lab-l3evpn](./lab-l3evpn/LAB_GUIDE.md) — L3 EVPN / VRF テナント分離
+
+**目的:** lab-evpn で学んだ L2 EVPN を発展させ、VRF による L3 テナント分離と BGP EVPN Type-5（IP Prefix）ルートによるサブネット間ルーティングを実装する。Anycast Gateway（分散ゲートウェイ）の動作確認と VRF 分離の検証を通じて、DC ファブリックの L3 設計を理解することがゴール。
+
+| 項目 | 内容 |
+|------|------|
+| 構成 | Leaf-Spine（Spine×2・Leaf×2・Host×3）|
+| 台数 | 7台 |
+| ハンズオンで設定すること | VRF / L3VNI / Anycast Gateway / BGP EVPN Type-5 ルート広告 |
+
+---
+
 ### ラボの起動・停止
 
 全ラボ共通で `deploy.sh` / `destroy.sh` を使って操作する。
