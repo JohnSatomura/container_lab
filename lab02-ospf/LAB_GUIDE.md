@@ -164,6 +164,78 @@ containerlab inspect -t topology.yml
 
 ---
 
+## ハンズオン設定手順
+
+各ノードに接続してから `configure` モードで入力する。
+
+```bash
+# 例: ceos1 に接続
+docker exec -it clab-lab02-ospf-ceos1 Cli
+```
+
+接続後:
+
+```
+configure
+```
+
+### ceos1（ABR: Area0 + Area1）
+
+```
+router ospf 1
+   router-id 1.1.1.1
+   network 1.1.1.1/32 area 0.0.0.0
+   network 10.0.0.0/24 area 0.0.0.0
+   network 10.1.0.0/30 area 0.0.0.1
+```
+
+### ceos2（ABR: Area0 + Area2）
+
+```
+router ospf 1
+   router-id 2.2.2.2
+   network 2.2.2.2/32 area 0.0.0.0
+   network 10.0.0.0/24 area 0.0.0.0
+   network 10.2.0.0/30 area 0.0.0.2
+```
+
+### ceos3（バックボーンルーター: Area0 のみ）
+
+```
+router ospf 1
+   router-id 3.3.3.3
+   network 3.3.3.3/32 area 0.0.0.0
+   network 10.0.0.0/24 area 0.0.0.0
+```
+
+### ceos4（内部ルーター: Area1 のみ）
+
+```
+router ospf 1
+   router-id 4.4.4.4
+   network 4.4.4.4/32 area 0.0.0.1
+   network 10.1.0.0/30 area 0.0.0.1
+```
+
+### ceos5（内部ルーター: Area2 のみ）
+
+```
+router ospf 1
+   router-id 5.5.5.5
+   network 5.5.5.5/32 area 0.0.0.2
+   network 10.2.0.0/30 area 0.0.0.2
+```
+
+### 設定のポイント
+
+- `network` コマンドの第1引数は**サブネットアドレス**を指定する（ホストアドレスではない）
+  - Loopback0（1.1.1.1/32）は /32 なのでホストアドレス=サブネットアドレスが一致する
+  - Ethernet2（10.1.0.1/30）のサブネットは `10.1.0.0/30`（.1 ではなく .0）
+- ABR（ceos1・ceos2）は `network` コマンドを2つのエリアに分けて設定する
+- `area 0.0.0.0` は `area 0` と書いても同義
+
+---
+
 ## 確認手順
 
 ### 1. DR/BDR 選出の確認
