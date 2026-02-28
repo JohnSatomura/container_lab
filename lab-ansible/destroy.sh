@@ -8,10 +8,10 @@ containerlab destroy -t topology.yml
 # 自動生成ディレクトリを削除（次回 deploy 時に startup-config が確実に反映されるようにする）
 rm -rf clab-lab-ansible/
 
-# ansible-lab04 コンテナを削除
-if docker ps -a --format '{{.Names}}' | grep -q '^ansible-lab04$'; then
-  echo "[INFO] ansible-lab04 コンテナを削除します"
-  docker rm -f ansible-lab04
+# ansible-lab-ansible コンテナを削除
+if docker ps -a --format '{{.Names}}' | grep -q '^ansible-lab-ansible$'; then
+  echo "[INFO] ansible-lab-ansible コンテナを削除します"
+  docker rm -f ansible-lab-ansible
 fi
 
 # ansible-eos イメージを削除

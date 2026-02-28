@@ -106,7 +106,7 @@ ansible-galaxy collection list | grep arista
 ### 動作確認
 
 ```bash
-# Ansible が EOS に接続できるか確認（lab04 が起動済みの状態で）
+# Ansible が EOS に接続できるか確認（lab-ansible が起動済みの状態で）
 cd ~/git/container_lab/lab-ansible/ansible
 ansible all -i inventory.yml -m arista.eos.eos_command -a "commands='show version'" | head -20
 ```

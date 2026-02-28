@@ -21,7 +21,7 @@ containerlab deploy -t topology.yml
 # Ansible コンテナを起動
 echo "[INFO] Ansible コンテナを起動します"
 docker run -d \
-  --name ansible-lab04 \
+  --name ansible-lab-ansible \
   --network clab \
   -v /etc/hosts:/etc/hosts:ro \
   -v "$(pwd)/ansible":/ansible \
@@ -50,9 +50,9 @@ if [ "$AUTO_APPLY" = true ]; then
   done
 
   echo "[INFO] Ansible で OSPF 設定を投入します"
-  docker exec ansible-lab04 \
+  docker exec ansible-lab-ansible \
     ansible-playbook -i /ansible/inventory.yml /ansible/playbooks/site.yml
   echo "[INFO] Ansible による OSPF 設定投入が完了しました"
 fi
 
-echo "[INFO] Ansible コンテナにログインするには: docker exec -it ansible-lab04 bash"
+echo "[INFO] Ansible コンテナにログインするには: docker exec -it ansible-lab-ansible bash"

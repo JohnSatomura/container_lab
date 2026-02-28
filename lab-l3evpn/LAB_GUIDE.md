@@ -109,7 +109,7 @@ cd lab-l3evpn
 処理の流れ:
 1. `ansible-eos` Docker イメージをビルド (python:3.11-slim + ansible + arista.eos)
 2. `containerlab deploy` で全ノードを configs-init で起動
-3. `ansible-lab06` コンテナを起動
+3. `ansible-lab-l3evpn` コンテナを起動
 4. 全ノードの eAPI 起動を待機
 5. `site.yml` を実行して L3 EVPN 設定を一括投入
 
@@ -117,13 +117,13 @@ cd lab-l3evpn
 
 ```bash
 # Ansible コンテナにログイン
-docker exec -it ansible-lab06 bash
+docker exec -it ansible-lab-l3evpn bash
 
 # 動作確認 playbook を実行
-docker exec ansible-lab06 ansible-playbook -i /ansible/inventory.yml /ansible/playbooks/verify.yml
+docker exec ansible-lab-l3evpn ansible-playbook -i /ansible/inventory.yml /ansible/playbooks/verify.yml
 
 # 設定を再投入したい場合
-docker exec ansible-lab06 ansible-playbook -i /ansible/inventory.yml /ansible/playbooks/site.yml
+docker exec ansible-lab-l3evpn ansible-playbook -i /ansible/inventory.yml /ansible/playbooks/site.yml
 ```
 
 ### ハンズオンモード (手動設定練習)
@@ -136,7 +136,7 @@ cd lab-l3evpn
 init 設定: Spine は P2P IP アドレスのみ。Leaf は Loopback + P2P IP のみ。
 BGP / EVPN / VRF / VLAN / VXLAN は手動で設定する。
 
-`ansible-lab06` コンテナのみ起動しており、設定投入は行われない。手動設定後に verify.yml で確認できる。
+`ansible-lab-l3evpn` コンテナのみ起動しており、設定投入は行われない。手動設定後に verify.yml で確認できる。
 
 完成形の設定は `configs-full/` を参照:
 - `configs-full/spine1.cfg`, `spine2.cfg`: Spine の BGP 設定
@@ -368,6 +368,6 @@ docker exec -it clab-lab-l3evpn-host1 Cli -p 15 -c "ping 192.168.30.10 source 19
 
 以下をまとめて削除する:
 - containerlab ノード全台
-- `ansible-lab06` コンテナ
+- `ansible-lab-l3evpn` コンテナ
 - `ansible-eos` Docker イメージ
 - `clab-lab-l3evpn/` ディレクトリ

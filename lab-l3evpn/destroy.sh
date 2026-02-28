@@ -8,10 +8,10 @@ containerlab destroy -t topology.yml
 # 自動生成ディレクトリを削除
 rm -rf clab-lab-l3evpn/
 
-# ansible-lab06 コンテナを削除
-if docker ps -a --format '{{.Names}}' | grep -q '^ansible-lab06$'; then
-  echo "[INFO] ansible-lab06 コンテナを削除します"
-  docker rm -f ansible-lab06
+# ansible-lab-l3evpn コンテナを削除
+if docker ps -a --format '{{.Names}}' | grep -q '^ansible-lab-l3evpn$'; then
+  echo "[INFO] ansible-lab-l3evpn コンテナを削除します"
+  docker rm -f ansible-lab-l3evpn
 fi
 
 # ansible-eos イメージを削除

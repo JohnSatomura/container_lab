@@ -428,7 +428,7 @@ RFC: **RFC 7432** (Type-1 to Type-4), **RFC 9136** (Type-5)
 
 ### OSPF から eBGP に変えた理由
 
-lab04 ではアンダーレイに OSPF を使ったが、lab05 では eBGP に変更している。
+lab-ansible ではアンダーレイに OSPF を使ったが、lab-evpn では eBGP に変更している。
 
 | 観点 | OSPF | eBGP (今回) |
 |------|------|------------|

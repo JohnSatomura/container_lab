@@ -21,7 +21,7 @@ containerlab deploy -t topology.yml
 # Ansible コンテナを起動
 echo "[INFO] Ansible コンテナを起動します"
 docker run -d \
-  --name ansible-lab06 \
+  --name ansible-lab-l3evpn \
   --network clab \
   -v /etc/hosts:/etc/hosts:ro \
   -v "$(pwd)/ansible":/ansible \
@@ -49,15 +49,15 @@ if [ "$AUTO_APPLY" = true ]; then
   done
 
   echo "[INFO] Ansible で L3 EVPN 設定を投入します"
-  docker exec ansible-lab06 \
+  docker exec ansible-lab-l3evpn \
     ansible-playbook -i /ansible/inventory.yml /ansible/playbooks/site.yml
   echo "[INFO] Ansible による設定投入が完了しました"
 fi
 
 echo ""
 echo "[INFO] Ansible コンテナにログインするには:"
-echo "  docker exec -it ansible-lab06 bash"
+echo "  docker exec -it ansible-lab-l3evpn bash"
 echo ""
 echo "[INFO] playbook を手動実行するには:"
-echo "  docker exec ansible-lab06 ansible-playbook -i /ansible/inventory.yml /ansible/playbooks/site.yml"
-echo "  docker exec ansible-lab06 ansible-playbook -i /ansible/inventory.yml /ansible/playbooks/verify.yml"
+echo "  docker exec ansible-lab-l3evpn ansible-playbook -i /ansible/inventory.yml /ansible/playbooks/site.yml"
+echo "  docker exec ansible-lab-l3evpn ansible-playbook -i /ansible/inventory.yml /ansible/playbooks/verify.yml"

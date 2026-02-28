@@ -6,7 +6,7 @@ lab-evpn (L2 EVPN) と lab-l3evpn (L3 EVPN) の構成・動作・設定の違い
 
 ## 1. 一言での違い
 
-| | L2 EVPN (lab05) | L3 EVPN (lab06) |
+| | L2 EVPN (lab-evpn) | L3 EVPN (lab-l3evpn) |
 |-|-----------------|-----------------|
 | **目的** | 異なる Leaf に接続されたホストを**同一 L2 セグメント**として扱う | 異なる Leaf に接続されたホスト間を**サブネット越えで L3 ルーティング**する |
 | **転送方式** | L2 フォワーディング (MAC ベース) | L3 ルーティング (IP ベース) + VRF テナント分離 |
@@ -16,7 +16,7 @@ lab-evpn (L2 EVPN) と lab-l3evpn (L3 EVPN) の構成・動作・設定の違い
 
 ## 2. トポロジ比較
 
-### L2 EVPN (lab05)
+### L2 EVPN (lab-evpn)
 
 ```
 Spine1 / Spine2 (AS65000)
@@ -31,7 +31,7 @@ Host1 (192.168.10.1/24)  Host2 (192.168.10.2/24)
 - VXLAN で L2 延伸しているため、ホストから見ると同一スイッチに繋がっているように見える
 - Leaf は L2 スイッチとして動作し、ルーティングしない
 
-### L3 EVPN (lab06)
+### L3 EVPN (lab-l3evpn)
 
 ```
 Spine1 / Spine2 (AS65000)
@@ -211,7 +211,7 @@ Spine は L2/L3 EVPN 共通設定。`next-hop-unchanged` が必須なのは同�
 
 ### Leaf 側の差分
 
-| 設定項目 | L2 EVPN (lab05) | L3 EVPN (lab06) |
+| 設定項目 | L2 EVPN (lab-evpn) | L3 EVPN (lab-l3evpn) |
 |---------|-----------------|-----------------|
 | `vrf instance` | なし | あり (`TENANT_A`, `TENANT_B`) |
 | `ip routing vrf` | なし | あり (VRF ごとに有効化) |

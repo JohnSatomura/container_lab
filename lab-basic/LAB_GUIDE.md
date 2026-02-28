@@ -59,13 +59,13 @@ lab-basic/
 ├── configs-init/         # ハンズオンモード用（hostname のみ）
 │   ├── ceos1.cfg
 │   └── ceos2.cfg
-└── configs-full/         # フルコンフィグモード用（lab01 は init と同一）
+└── configs-full/         # フルコンフィグモード用（lab-basic は init と同一）
     ├── ceos1.cfg
     └── ceos2.cfg
 ```
 
 > **Note:** lab-basic はルーティング設定がないため、configs-init と configs-full の内容は同一。
-> `--full` オプションは lab02 以降で意味を持つ。
+> `--full` オプションは lab-ospf 以降で意味を持つ。
 
 ---
 
