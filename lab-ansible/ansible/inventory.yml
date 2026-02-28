@@ -1,0 +1,24 @@
+all:
+  children:
+    spine:
+      hosts:
+        ceos1:
+          ansible_host: clab-ansible-ceos1
+        ceos2:
+          ansible_host: clab-ansible-ceos2
+    leaf:
+      hosts:
+        ceos3:
+          ansible_host: clab-ansible-ceos3
+        ceos4:
+          ansible_host: clab-ansible-ceos4
+        ceos5:
+          ansible_host: clab-ansible-ceos5
+        ceos6:
+          ansible_host: clab-ansible-ceos6
+    host:
+      hosts:
+        ceos7:
+          ansible_host: clab-ansible-ceos7
+        ceos8:
+          ansible_host: clab-ansible-ceos8

@@ -41,12 +41,12 @@ docker exec <コンテナ名> /usr/bin/Cli -p 15 -c "ping 5.5.5.5 source 4.4.4.4
 
 | ラボ | コンテナ名の例 |
 |------|--------------|
-| lab01-basic | `clab-lab01-basic-ceos1` |
-| lab02-ospf | `clab-lab02-ospf-ceos1` |
-| lab03-bgp | `clab-lab03-bgp-ceos1` |
-| lab04-ansible | `clab-lab04-ansible-ceos1` |
-| lab05-evpn | `clab-lab05-evpn-spine1` / `clab-lab05-evpn-leaf1` / `clab-lab05-evpn-host1` |
-| lab06-l3evpn | `clab-lab06-l3evpn-spine1` / `clab-lab06-l3evpn-leaf1` / `clab-lab06-l3evpn-host1` |
+| lab-basic | `clab-basic-ceos1` |
+| lab-ospf | `clab-ospf-ceos1` |
+| lab-bgp | `clab-bgp-ceos1` |
+| lab-ansible | `clab-ansible-ceos1` |
+| lab-evpn | `clab-evpn-spine1` / `clab-evpn-leaf1` / `clab-evpn-host1` |
+| lab-l3evpn | `clab-l3evpn-spine1` / `clab-l3evpn-leaf1` / `clab-l3evpn-host1` |
 
 ---
 
@@ -66,7 +66,7 @@ show logging last 20             # 直近 20 行のシステムログ
 
 ---
 
-## OSPF 確認コマンド（lab02-ospf）
+## OSPF 確認コマンド（lab-ospf）
 
 ```
 show ip ospf neighbor            # 隣接関係一覧（State・DR/BDR 役割）
@@ -104,7 +104,7 @@ show ip route ospf               # OSPF で学習したルートのみ表示（O
 
 ---
 
-## BGP 確認コマンド（lab03-bgp）
+## BGP 確認コマンド（lab-bgp）
 
 ```
 show bgp summary                 # ピア一覧（State・受信プレフィックス数）
@@ -158,7 +158,7 @@ show ip bgp                      # redistribute ospf で BGP に入った経路�
 
 ---
 
-## VXLAN 確認コマンド（lab05-evpn / lab06-l3evpn 共通）
+## VXLAN 確認コマンド（lab-evpn / lab-l3evpn 共通）
 
 ```
 show vxlan vtep                  # 発見済み VTEP 一覧（Type-3 ルートで自動学習した VTEP IP）
@@ -178,7 +178,7 @@ show vxlan flood vtep            # BUM トラフィックのフラッディン�
 
 ---
 
-## BGP EVPN 確認コマンド（lab05-evpn / lab06-l3evpn 共通）
+## BGP EVPN 確認コマンド（lab-evpn / lab-l3evpn 共通）
 
 ```
 show bgp evpn summary            # EVPN セッション一覧（ピア IP・State・受信ルート数）
@@ -200,7 +200,7 @@ show mac address-table dynamic   # 動的学習エントリのみ表示
 
 ---
 
-## L3 EVPN / VRF 確認コマンド（lab06-l3evpn）
+## L3 EVPN / VRF 確認コマンド（lab-l3evpn）
 
 ```
 show vrf                              # VRF 一覧（名前・RD・動作プロトコル）

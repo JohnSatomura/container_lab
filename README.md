@@ -119,7 +119,7 @@ containerlab version
 
 ---
 
-### [lab01-basic](./lab01-basic/LAB_GUIDE.md) — 2ノード シンプル接続
+### [lab-basic](./lab-basic/LAB_GUIDE.md) — 2ノード シンプル接続
 
 **目的:** containerlab と cEOS の基本操作を習得する。ルーティング設定は行わず、コンテナの起動・停止・EOS CLI へのアクセス方法を確認することがゴール。後続ラボを進めるための土台として位置付けている。
 
@@ -131,7 +131,7 @@ containerlab version
 
 ---
 
-### [lab02-ospf](./lab02-ospf/LAB_GUIDE.md) — OSPF マルチエリア + DR/BDR
+### [lab-ospf](./lab-ospf/LAB_GUIDE.md) — OSPF マルチエリア + DR/BDR
 
 **目的:** OSPF のマルチエリア構成を自分で設定することで、エリア設計の考え方・DR/BDR 選出のメカニズム・ABR がどのようにエリア間でルートを伝播するかを体験的に理解する。単に覚えるだけでなく「なぜそう動くか」を実機に近い環境で確認できる。
 
@@ -143,7 +143,7 @@ containerlab version
 
 ---
 
-### [lab03-bgp](./lab03-bgp/LAB_GUIDE.md) — BGP 経路制御（マルチホーム・AS-PATH prepend）
+### [lab-bgp](./lab-bgp/LAB_GUIDE.md) — BGP 経路制御（マルチホーム・AS-PATH prepend）
 
 **目的:** ISP を2社挟んだマルチホーム構成で iBGP・eBGP を設定し、AS-PATH prepend による経路誘導を実感する。primary/backup の経路設計を通じて、BGP のベストパス選択ルールと経路制御の仕組みを理解することがゴール。
 
@@ -155,7 +155,7 @@ containerlab version
 
 ---
 
-### [lab04-ansible](./lab04-ansible/LAB_GUIDE.md) — Ansible による Leaf-Spine OSPF 自動設定
+### [lab-ansible](./lab-ansible/LAB_GUIDE.md) — Ansible による Leaf-Spine OSPF 自動設定
 
 **目的:** 8台の Leaf-Spine 構成に対して Ansible（arista.eos コレクション）で OSPF を一括設定することで、ネットワーク自動化の価値を体感する。手動設定の手間と自動化の効率を比較しながら、inventory/group_vars/host_vars/playbook の構造と eAPI 接続の仕組みを理解することがゴール。
 
@@ -164,6 +164,30 @@ containerlab version
 | 構成 | Leaf-Spine（Spine×2・Leaf×4・Host×2）|
 | 台数 | 8台 |
 | ハンズオンで設定すること | Ansible playbook で OSPF を一括投入（`eos_config` / `eos_command` モジュール）|
+
+---
+
+### [lab-evpn](./lab-evpn/LAB_GUIDE.md) — BGP EVPN / VXLAN L2 ストレッチ
+
+**目的:** Leaf-Spine ファブリック上で BGP EVPN + VXLAN を構成し、異なる Leaf に接続されたホスト同士が L2 レベルで通信できることを確認する。アンダーレイ eBGP でルータブル基盤を作り、オーバーレイ BGP EVPN で VTEP を自動発見する仕組みを体感することがゴール。
+
+| 項目 | 内容 |
+|------|------|
+| 構成 | Leaf-Spine（Spine×2・Leaf×4・Host×2）|
+| 台数 | 8台 |
+| ハンズオンで設定すること | アンダーレイ eBGP（Loopback 広告）+ オーバーレイ EVPN（VTEP 設定・VLAN/VNI マッピング）|
+
+---
+
+### [lab-l3evpn](./lab-l3evpn/LAB_GUIDE.md) — L3 EVPN / VRF テナント分離
+
+**目的:** lab-evpn で学んだ L2 EVPN を発展させ、VRF による L3 テナント分離と BGP EVPN Type-5（IP Prefix）ルートによるサブネット間ルーティングを実装する。Anycast Gateway（分散ゲートウェイ）の動作確認と VRF 分離の検証を通じて、DC ファブリックの L3 設計を理解することがゴール。
+
+| 項目 | 内容 |
+|------|------|
+| 構成 | Leaf-Spine（Spine×2・Leaf×2・Host×3）|
+| 台数 | 7台 |
+| ハンズオンで設定すること | VRF / L3VNI / Anycast Gateway / BGP EVPN Type-5 ルート広告 |
 
 ---
 

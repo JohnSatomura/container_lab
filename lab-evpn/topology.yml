@@ -1,0 +1,48 @@
+name: evpn
+
+topology:
+  nodes:
+    spine1:
+      kind: ceos
+      image: ceos:4.34.4M
+      startup-config: configs-init/spine1.cfg
+    spine2:
+      kind: ceos
+      image: ceos:4.34.4M
+      startup-config: configs-init/spine2.cfg
+    leaf1:
+      kind: ceos
+      image: ceos:4.34.4M
+      startup-config: configs-init/leaf1.cfg
+    leaf2:
+      kind: ceos
+      image: ceos:4.34.4M
+      startup-config: configs-init/leaf2.cfg
+    leaf3:
+      kind: ceos
+      image: ceos:4.34.4M
+      startup-config: configs-init/leaf3.cfg
+    leaf4:
+      kind: ceos
+      image: ceos:4.34.4M
+      startup-config: configs-init/leaf4.cfg
+    host1:
+      kind: ceos
+      image: ceos:4.34.4M
+      startup-config: configs-init/host1.cfg
+    host2:
+      kind: ceos
+      image: ceos:4.34.4M
+      startup-config: configs-init/host2.cfg
+
+  links:
+    - endpoints: ["spine1:eth1", "leaf1:eth1"]   # Spine1 - Leaf1
+    - endpoints: ["spine1:eth2", "leaf2:eth1"]   # Spine1 - Leaf2
+    - endpoints: ["spine1:eth3", "leaf3:eth1"]   # Spine1 - Leaf3
+    - endpoints: ["spine1:eth4", "leaf4:eth1"]   # Spine1 - Leaf4
+    - endpoints: ["spine2:eth1", "leaf1:eth2"]   # Spine2 - Leaf1
+    - endpoints: ["spine2:eth2", "leaf2:eth2"]   # Spine2 - Leaf2
+    - endpoints: ["spine2:eth3", "leaf3:eth2"]   # Spine2 - Leaf3
+    - endpoints: ["spine2:eth4", "leaf4:eth2"]   # Spine2 - Leaf4
+    - endpoints: ["leaf1:eth3",  "host1:eth1"]   # Leaf1  - Host1
+    - endpoints: ["leaf4:eth3",  "host2:eth1"]   # Leaf4  - Host2
