@@ -178,6 +178,138 @@ ceos2 経由は `65001`（長さ1）のままなので、ceos6 から見て ISP-
 
 ---
 
+## ハンズオン設定手順
+
+各ノードに接続してから `configure` モードで入力する。
+
+```bash
+# 例: ceos1 に接続
+docker exec -it clab-lab03-bgp-ceos1 Cli
+```
+
+接続後:
+
+```
+configure
+```
+
+### ceos1（AS65001 顧客スタブ - eBGP + AS-PATH prepend + export filter）
+
+スタブ AS は他 AS のルートを中継しないよう、export filter で自 prefix のみを広告する。
+ISP-B（ceos3）側の広告に prepend を設定してバックアップパスとして誘導する。
+
+```
+ip prefix-list OWN-PREFIX seq 10 permit 1.1.1.1/32
+!
+route-map EXPORT-TO-ISPA permit 10
+   match ip address prefix-list OWN-PREFIX
+!
+route-map EXPORT-TO-ISPB permit 10
+   match ip address prefix-list OWN-PREFIX
+   set as-path prepend 65001 65001
+!
+router bgp 65001
+   router-id 1.1.1.1
+   neighbor 10.0.12.2 remote-as 65002
+   neighbor 10.0.12.2 route-map EXPORT-TO-ISPA out
+   neighbor 10.0.13.2 remote-as 65003
+   neighbor 10.0.13.2 route-map EXPORT-TO-ISPB out
+   !
+   address-family ipv4
+      neighbor 10.0.12.2 activate
+      neighbor 10.0.13.2 activate
+      network 1.1.1.1/32
+```
+
+### ceos2（AS65002 ISP-A 上流 - eBGP + iBGP + next-hop-self）
+
+```
+router bgp 65002
+   router-id 2.2.2.2
+   neighbor 10.0.12.1 remote-as 65001
+   neighbor 10.0.24.2 remote-as 65002
+   neighbor 10.0.24.2 next-hop-self
+   !
+   address-family ipv4
+      neighbor 10.0.12.1 activate
+      neighbor 10.0.24.2 activate
+      network 2.2.2.2/32
+```
+
+### ceos3（AS65003 ISP-B 上流 - eBGP + iBGP + next-hop-self）
+
+```
+router bgp 65003
+   router-id 3.3.3.3
+   neighbor 10.0.13.1 remote-as 65001
+   neighbor 10.0.35.2 remote-as 65003
+   neighbor 10.0.35.2 next-hop-self
+   !
+   address-family ipv4
+      neighbor 10.0.13.1 activate
+      neighbor 10.0.35.2 activate
+      network 3.3.3.3/32
+```
+
+### ceos4（AS65002 ISP-A 下流 - iBGP + eBGP + next-hop-self）
+
+```
+router bgp 65002
+   router-id 4.4.4.4
+   neighbor 10.0.24.1 remote-as 65002
+   neighbor 10.0.24.1 next-hop-self
+   neighbor 10.0.46.2 remote-as 65004
+   !
+   address-family ipv4
+      neighbor 10.0.24.1 activate
+      neighbor 10.0.46.2 activate
+      network 4.4.4.4/32
+```
+
+### ceos5（AS65003 ISP-B 下流 - iBGP + eBGP + next-hop-self）
+
+```
+router bgp 65003
+   router-id 5.5.5.5
+   neighbor 10.0.35.1 remote-as 65003
+   neighbor 10.0.35.1 next-hop-self
+   neighbor 10.0.56.2 remote-as 65004
+   !
+   address-family ipv4
+      neighbor 10.0.35.1 activate
+      neighbor 10.0.56.2 activate
+      network 5.5.5.5/32
+```
+
+### ceos6（AS65004 顧客スタブ - eBGP + export filter）
+
+```
+ip prefix-list OWN-PREFIX seq 10 permit 6.6.6.6/32
+!
+route-map EXPORT-OWN-ONLY permit 10
+   match ip address prefix-list OWN-PREFIX
+!
+router bgp 65004
+   router-id 6.6.6.6
+   neighbor 10.0.46.1 remote-as 65002
+   neighbor 10.0.46.1 route-map EXPORT-OWN-ONLY out
+   neighbor 10.0.56.1 remote-as 65003
+   neighbor 10.0.56.1 route-map EXPORT-OWN-ONLY out
+   !
+   address-family ipv4
+      neighbor 10.0.46.1 activate
+      neighbor 10.0.56.1 activate
+      network 6.6.6.6/32
+```
+
+### 設定のポイント
+
+- **next-hop-self が必要な理由**: iBGP はデフォルトで nexthop を書き換えない。ceos2 が ceos1 からの eBGP ルート（nexthop=10.0.12.1）を ceos4 に iBGP 広告する場合、nexthop はそのまま 10.0.12.1 として伝達される。ceos4 は 10.0.12.1 への経路を持たないためルートが使えない。`next-hop-self` を設定すると nexthop が ceos2 自身の IP（10.0.24.1）に書き換えられ、ceos4 から到達可能になる
+- **export filter が必要な理由**: スタブ AS（ceos1・ceos6）で export filter がないと、一方の ISP から受け取ったルートをもう一方の ISP に広告してしまい transit AS として動作する。この場合 ceos6 から見た 1.1.1.1/32 の AS-PATH に transit 経路が混入し、prepend の効果が正しく確認できなくなる
+- **route-map の暗黙 deny**: `permit` 句で許可した経路以外は暗黙の `deny` で落とされる。export filter はこの性質を利用して自 prefix のみを通過させる
+
+---
+
 ## 確認手順
 
 ### 1. BGP セッション確認
